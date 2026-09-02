@@ -1,5 +1,5 @@
-// Arquivo CSV local de produtos na pasta do projeto
-const LOCAL_CSV_PATH = "SummerProducts.csv";
+// URL pública da planilha Google Sheets (pub?output=csv)
+const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMcxBOZb0MNVidxXxe2LIzWwI9MNG3OyRexIBMitroPKb2XqB2pf6y9GXfCRfQKfhRaiviA6ouzALS/pub?output=csv";
 let products = [];
 let cart = [];
 let activeCategory = "Espetos";
@@ -88,9 +88,9 @@ function parseCSV(csvText) {
   });
 }
 
-// Fallback estático com os produtos do SummerProducts.csv para execução via protocol file://
+// Fallback estático com a totalidade dos produtos de SummerProducts.csv para execução via protocol file://
 const EMBEDDED_PRODUCTS = [
-  { id: 1, category: "Espetos", name: "Carne Bovina", description: "Mix de Carnes, Alcatra, Bananinha, Fraldinha", price: 10.00, image: convertDriveLink("https://drive.google.com/file/d/1AZMEi_M-i4N1GwoMaQWh8JiIKjsrgBPs/view?usp=drive_link") },
+  { id: 1, category: "Espetos", name: "Carne Bovina", description: "Mix de Carnes Nobres, Alcatra, Bananinha, Fraldinha", price: 10.00, image: convertDriveLink("https://drive.google.com/file/d/1AZMEi_M-i4N1GwoMaQWh8JiIKjsrgBPs/view?usp=drive_link") },
   { id: 2, category: "Espetos", name: "Medalhão de Frango", description: "Envolto em bacon", price: 10.00, image: convertDriveLink("https://drive.google.com/file/d/1SRv2HLDW0MSHO0zwNBhjg-PJGyp5UxjY/view?usp=drive_link") },
   { id: 3, category: "Espetos", name: "Coração", description: "Coração de frango temperado", price: 10.00, image: convertDriveLink("https://drive.google.com/file/d/1ogg7byP5HjIN3cRq3c_zKODBZek-TuPZ/view?usp=drive_link") },
   { id: 4, category: "Espetos", name: "Linguiça", description: "Linguiça", price: 10.00, image: convertDriveLink("https://drive.google.com/file/d/1UR5JrBspHjIefQNFQ2wHsQkwImhD1OLK/view?usp=drive_link") },
@@ -101,31 +101,33 @@ const EMBEDDED_PRODUCTS = [
   { id: 9, category: "Espetos", name: "Medalhão de Queijo", description: "Queijo com bacon", price: 11.90, image: convertDriveLink("https://drive.google.com/file/d/1vBsXaqZJFiP0KAwFLrUbTiJHVIKakFRq/view?usp=drive_link") },
   { id: 10, category: "Espetos", name: "Provolone", description: "Provolone defumado", price: 11.90, image: convertDriveLink("https://drive.google.com/file/d/1tckxiVnaDj4laYdq94LivtrhvXqW3iE_/view?usp=drive_link") },
   { id: 11, category: "Espetos", name: "Pão de Alho", description: "Pão de alho recheado", price: 8.50, image: convertDriveLink("https://drive.google.com/file/d/14T9e74PytlbVVSXJp3HF4nahfRcApNNL/view?usp=drive_link") },
-  { id: 12, category: "Espetos", name: "Jantinha Completa", description: "Acompanha arroz, vinagrete, batata frita e um espeto do cardápio. Kafta: + R$ 4,50", price: 22.90, image: convertDriveLink("https://drive.google.com/file/d/1Lp7jDfQzbCfmBypFOx_MIypuOdzbCT61/view?usp=drive_link") },
+  { id: 12, category: "Espetos", name: "Jantinha Completa", description: "Acompanha arroz, vinagrete e batata frita e um espeto do cardápio", price: 22.90, image: convertDriveLink("https://drive.google.com/file/d/1Lp7jDfQzbCfmBypFOx_MIypuOdzbCT61/view?usp=drive_link") },
   { id: 13, category: "Porcoes", name: "Bolinho Tilápia com Queijo", description: "Porção com molho especial", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1Wee0cr3UDW4Ez3RzW_2tbBH8uNokOHJk/view?usp=drive_link") },
-  { id: 14, category: "Porcoes", name: "Bolinho Costela", description: "Costela desfiada", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1Wee0cr3UDW4Ez3RzW_2tbBH8uNokOHJk/view?usp=drive_link") },
+  { id: 14, category: "Porcoes", name: "Bolinho Costela", description: "Costela desfiada", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1yat8foRh-GxVXgr7aadP4u6knabcu_tq/view?usp=drive_link") },
   { id: 15, category: "Porcoes", name: "Bolinho Carne Seca com Mandioca", description: "Tradicional", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/11tTbr2l2et17JLKenmcfOAr-6QFeDzL0/view?usp=drive_link") },
   { id: 16, category: "Porcoes", name: "Bolinho Mandioqueijo", description: "Massa de mandioca com queijo", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1Wee0cr3UDW4Ez3RzW_2tbBH8uNokOHJk/view?usp=drive_link") },
-  { id: 17, category: "Porcoes", name: "Coxinha Cremosa", description: "Coxinha de frango com catupiry", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1Wee0cr3UDW4Ez3RzW_2tbBH8uNokOHJk/view?usp=drive_link") },
+  { id: 17, category: "Porcoes", name: "Coxinha Cremosa", description: "Coxinha de frango com catupiry", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1mY-H8lfZtcp1ImT-hxAC_yfDZeT4RizB/view?usp=drive_link") },
   { id: 18, category: "Porcoes", name: "Pérola de Queijo Canastra", description: "Queijo canastra empanado", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1aq1FWB9pBcjiuvnv0sjpyGChjuWue14O/view?usp=drive_link") },
   { id: 19, category: "Porcoes", name: "Meia Batata", description: "Porção menor de batata frita", price: 16.90, image: convertDriveLink("https://drive.google.com/file/d/1oz7xLvrzTkpPmfEBrLCno8zG1diyk0wu/view?usp=drive_link") },
-  { id: 20, category: "Porcoes", name: "Batata Frita", description: "Batata frita crocante. Adicionais: Bacon, Catupiry, Cheddar e Muçarela (R$ 4,00 cada)", price: 26.90, image: convertDriveLink("https://drive.google.com/file/d/1IlawdsLSLCUEJyh_BDUSotPwv4gUo9dh/view?usp=drive_link") },
-  { id: 21, category: "Porcoes", name: "Bolinho Alho Poró", description: "Sabor marcante", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1Wee0cr3UDW4Ez3RzW_2tbBH8uNokOHJk/view?usp=drive_link") },
-  { id: 22, category: "Porcoes", name: "Bolinho de Feijoada", description: "Recheado com couve e torresmo", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1Wee0cr3UDW4Ez3RzW_2tbBH8uNokOHJk/view?usp=drive_link") },
+  { id: 20, category: "Porcoes", name: "Batata Frita", description: "Batata frita crocante, Adicionais: Bacon, Catupiry, cheddar e mussarela", price: 26.90, image: convertDriveLink("https://drive.google.com/file/d/1IlawdsLSLCUEJyh_BDUSotPwv4gUo9dh/view?usp=drive_link") },
+  { id: 21, category: "Porcoes", name: "Bolinho Alho Poró", description: "Sabor marcante", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1sUrcCFyfdTS_MtAhW0JVfzjECRjvqLtr/view?usp=drive_link") },
+  { id: 22, category: "Porcoes", name: "Bolinho de Feijoada", description: "Recheado com couve e torresmo", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1u6_P-8y5o5HiJPPzRYsbZDWO-q8beihh/view?usp=drive_link") },
   { id: 23, category: "Porcoes", name: "Costelinha Barbecue", description: "Costelinha suína ao molho barbecue", price: 64.90, image: convertDriveLink("https://drive.google.com/file/d/1tnyu4DDHIC9M7ujCDYjSsInJZqP2hHaD/view?usp=drive_link") },
   { id: 24, category: "Porcoes", name: "Isca de Tilápia", description: "Filé de tilápia empanado", price: 45.90, image: convertDriveLink("https://drive.google.com/file/d/10TkJ58VcTZ4QHDdEj724P3f-Cssxgyiv/view?usp=drive_link") },
+  { id: 79, category: "Porcoes", name: "Tábua de 4 Mini Hambúrgueres", description: "Mini Hambúrgeres Artesanais ( Pão brioche, Carne, Mussarela, Bacon, Alface e Catupiriy/Cheddar)", price: 44.90, image: convertDriveLink("https://drive.google.com/file/d/11Sq9pFpDywjpgOjxixTfv958zkSqOItt/view?usp=drive_link") },
+  { id: 80, category: "Porcoes", name: "Tábua de 6 Mini Hambúrgueres", description: "Tábua Grande", price: 55.90, image: convertDriveLink("https://drive.google.com/file/d/1UROjW430-U0uqbb2G9SPEH5181_4isfB/view?usp=drive_link") },
   { id: 25, category: "Porcoes", name: "Isca de Frango", description: "Frango empanado crocante", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1PQ0eiMlapRki7UBgg103HmzHsNNIBc4F/view?usp=drive_link") },
   { id: 26, category: "Porcoes", name: "Salada", description: "Mix de folhas e legumes", price: 16.90, image: convertDriveLink("https://drive.google.com/file/d/16o1Jr4vBvxDiTwwRJAeerI5AyOJvOU1U/view?usp=drive_link") },
   { id: 27, category: "Porcoes", name: "Torresmo", description: "Torresmo de rolo sequinho", price: 45.90, image: convertDriveLink("https://drive.google.com/file/d/1xofSO3llmvlHBwIyj2TjhaIGSQd_Mw4t/view?usp=drive_link") },
   { id: 28, category: "Porcoes", name: "Kibe com Queijo", description: "Kibe recheado", price: 32.90, image: convertDriveLink("https://drive.google.com/file/d/1xJ7zooaefGNCePe8To_83j4E21IRekrw/view?usp=drive_link") },
-  { id: 29, category: "Porcoes", name: "Mandioca Frita Meia", description: "Porção menor de mandioca", price: 7.90, image: convertDriveLink("https://drive.google.com/file/d/1Wee0cr3UDW4Ez3RzW_2tbBH8uNokOHJk/view?usp=drive_link") },
-  { id: 30, category: "Porcoes", name: "Mandioca Frita", description: "Mandioca crocante", price: 16.00, image: convertDriveLink("https://drive.google.com/file/d/1Wee0cr3UDW4Ez3RzW_2tbBH8uNokOHJk/view?usp=drive_link") },
+  { id: 29, category: "Porcoes", name: "Mandioca Frita Meia", description: "Porção menor de mandioca", price: 7.90, image: convertDriveLink("https://drive.google.com/file/d/1UXX3MeDEJyGrtjqhBcZrP_q7hdGAhv9x/view?usp=drive_link") },
+  { id: 30, category: "Porcoes", name: "Mandioca Frita", description: "Mandioca crocante", price: 16.00, image: convertDriveLink("https://drive.google.com/file/d/1lsGmfvoi4UXbRa3MDHgEZ5Uar_hNvALI/view?usp=drive_link") },
   { id: 31, category: "Porcoes", name: "Petiscos", description: "Variados da casa", price: 12.90, image: convertDriveLink("https://drive.google.com/file/d/1y-0AcOSMwg6FDlhq3Ebx4ld1wueLKzcX/view?usp=drive_link") },
   { id: 32, category: "Cervejas", name: "Corona Zero Long Neck", description: "Sem álcool", price: 10.90, image: convertDriveLink("https://drive.google.com/file/d/1BCS30nwEy26aXBEmMxCwh5kXXdJf7UnX/view?usp=drive_link") },
   { id: 33, category: "Cervejas", name: "Skol Beats Sense 269ml", description: "Lata 269ml", price: 9.90, image: convertDriveLink("https://drive.google.com/file/d/16bV4CUDSesxF-lE0BoTtNXUUVGOPdslg/view?usp=drive_link") },
   { id: 34, category: "Cervejas", name: "Heineken Zero Long Neck", description: "Sem álcool", price: 8.90, image: convertDriveLink("https://drive.google.com/file/d/10--FOecVzIem7ywscuj6M2wPxyNmFS93/view?usp=drive_link") },
-  { id: 35, category: "Cervejas", name: "Michelob Long Neck", description: "Long neck gelada", price: 9.90, image: convertDriveLink("https://drive.google.com/file/d/11blCd1Flenj5WGO8ysPCZ63k4iRl7SvG/view?usp=drive_link") },
-  { id: 36, category: "Cervejas", name: "Chopp Caneca 300ml", description: "Chopp Pilsen Palazzo", price: 6.90, image: convertDriveLink("https://drive.google.com/file/d/1ZS021C_dJKbjRhsa7mK6ZYzoJc-DjKxz/view?usp=drive_link") },
+  { id: 35, category: "Cervejas", name: "Michelob Long Neck", description: "Low Carb", price: 9.90, image: convertDriveLink("https://drive.google.com/file/d/11blCd1Flenj5WGO8ysPCZ63k4iRl7SvG/view?usp=drive_link") },
+  { id: 36, category: "Cervejas", name: "Chopp Caneca 300ml", description: "Chopp Pilsen Palazzo", price: 3.40, image: convertDriveLink("https://drive.google.com/file/d/1ZS021C_dJKbjRhsa7mK6ZYzoJc-DjKxz/view?usp=drive_link") },
   { id: 37, category: "Cervejas", name: "Stella Pure Gold", description: "Sem glúten", price: 9.90, image: convertDriveLink("https://drive.google.com/file/d/1c6EpwVhLhwAHUihJqNTZPRnVkj3LQ648/view?usp=drive_link") },
   { id: 38, category: "Cervejas", name: "Império Lager 600", description: "Garrafa 600ml", price: 9.90, image: convertDriveLink("https://drive.google.com/file/d/1NypcSwaKsnr1iq_Yp4SiB7bJ0B8wKoUT/view?usp=drive_link") },
   { id: 39, category: "Cervejas", name: "Antarctica 600ml", description: "Garrafa 600ml", price: 10.90, image: convertDriveLink("https://drive.google.com/file/d/1fJ8rwPm2xIMsHAUNOnY4M-UTJfD0SHXe/view?usp=drive_link") },
@@ -155,14 +157,14 @@ const EMBEDDED_PRODUCTS = [
   { id: 63, category: "Bebidas", name: "Água", description: "Sem gás 500ml", price: 3.90, image: convertDriveLink("https://drive.google.com/file/d/1yKb6ogUDgxmwg_UHSSs_ZO974GMI5n_8/view?usp=drive_link") },
   { id: 64, category: "Bebidas", name: "Água com Gás", description: "Garrafa 500ml", price: 5.00, image: convertDriveLink("https://drive.google.com/file/d/1lod31q1PZMDpv3E6Y7MdFl09MgUuasz7/view?usp=drive_link") },
   { id: 65, category: "Bebidas", name: "Suco Copo", description: "Copo 300ml", price: 8.90, image: convertDriveLink("https://drive.google.com/file/d/1-ysm4u606TMRjLdu_AVx09702cMlfteD/view?usp=drive_link") },
-  { id: 66, category: "Bebidas", name: "Suco Jarra", description: "Jarra 1 Litro", price: 17.90, image: convertDriveLink("https://drive.google.com/file/d/1hiCkiakR5S8iWYWo-dJ18PB0VXxDtVDn/view?usp=drive_link") },
+  { id: 66, category: "Bebidas", name: "Suco Jarra", description: "Jarra 900 ml", price: 17.90, image: convertDriveLink("https://drive.google.com/file/d/1hiCkiakR5S8iWYWo-dJ18PB0VXxDtVDn/view?usp=drive_link") },
   { id: 67, category: "Bebidas", name: "Redbull Zero 250 ml", description: "Lata 250ml", price: 12.00, image: convertDriveLink("https://drive.google.com/file/d/1_fKROaCSzDQqiwoTfjFy-uUkoXqcReqy/view?usp=drive_link") },
   { id: 68, category: "Bebidas", name: "Limoneto H2O", description: "Garrafa 500ml", price: 8.00, image: convertDriveLink("https://drive.google.com/file/d/13DzpYAE9gheZ2iWxEwVQ3kdRq9KT1rFP/view?usp=drive_link") },
   { id: 69, category: "Bebidas", name: "Água Tônica", description: "Lata 350ml", price: 6.50, image: convertDriveLink("https://drive.google.com/file/d/1a7JrTVE6k4IUYbz6t0gP8RYEfqr5th9g/view?usp=drive_link") },
   { id: 70, category: "Bebidas", name: "Redbull 250ml", description: "Lata 250ml", price: 12.00, image: convertDriveLink("https://drive.google.com/file/d/11E_Oo_Yj3OlzZiMUDfJvv_7lRicHRXHO/view?usp=drive_link") },
   { id: 71, category: "Bebidas", name: "Gatorade Sabores", description: "Morango & Maracujá, Uva, Limão e Berry Blue", price: 8.00, image: convertDriveLink("https://drive.google.com/file/d/14wAKYP-K1Te8Ru4EIrR8fAAr7THmzE-b/view?usp=drive_link") },
   { id: 72, category: "Diversos", name: "Amendoim", description: "Sabores AmendoAlho & AmendoLemon", price: 4.99, image: convertDriveLink("https://drive.google.com/file/d/14wAKYP-K1Te8Ru4EIrR8fAAr7THmzE-b/view?usp=drive_link") },
-  { id: 73, category: "Diversos", name: "Barra de Proteína", description: "Ovomaltine, Snickers, Coco", price: 10.00, image: convertDriveLink("https://drive.google.com/file/d/14wAKYP-K1Te8Ru4EIrR8fAAr7THmzE-b/view?usp=drive_link") },
+  { id: 73, category: "Diversos", name: "Barra de Proteína", description: "Ovomaltine, Snickers, Coco,", price: 10.00, image: convertDriveLink("https://drive.google.com/file/d/14wAKYP-K1Te8Ru4EIrR8fAAr7THmzE-b/view?usp=drive_link") },
   { id: 74, category: "Diversos", name: "Trident", description: "Menta e Hortelâ", price: 3.00, image: convertDriveLink("https://drive.google.com/file/d/14wAKYP-K1Te8Ru4EIrR8fAAr7THmzE-b/view?usp=drive_link") },
   { id: 75, category: "Diversos", name: "Gelo", description: "Saco adicional", price: 2.00, image: convertDriveLink("https://drive.google.com/file/d/14wAKYP-K1Te8Ru4EIrR8fAAr7THmzE-b/view?usp=drive_link") },
   { id: 76, category: "Diversos", name: "CDB", description: "Limão, Sal e Gelo", price: 4.50, image: convertDriveLink("https://drive.google.com/file/d/14wAKYP-K1Te8Ru4EIrR8fAAr7THmzE-b/view?usp=drive_link") },
@@ -170,69 +172,107 @@ const EMBEDDED_PRODUCTS = [
   { id: 78, category: "Diversos", name: "Halls", description: "Unidade", price: 3.00, image: convertDriveLink("https://drive.google.com/file/d/14wAKYP-K1Te8Ru4EIrR8fAAr7THmzE-b/view?usp=drive_link") }
 ];
 
-// Função principal de carregamento dos dados de produtos (100% Local do Projeto)
-async function loadSheetData() {
-  if (productsGrid) {
-    productsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #9CA3AF; padding: 2rem; font-weight: bold;">Carregando cardápio...</p>`;
-  }
-
-  let csvText = "";
-
-  // Tenta carregar o arquivo SummerProducts.csv da pasta do projeto (quando servido por servidor web local ou remoto)
-  if (window.location.protocol !== "file:") {
-    try {
-      const response = await fetch(LOCAL_CSV_PATH);
-      if (response.ok) {
-        const text = await response.text();
-        if (text && !text.trim().startsWith("<!DOCTYPE")) {
-          csvText = text;
-          console.log("✅ Cardápio carregado do arquivo local SummerProducts.csv.");
-        }
-      }
-    } catch (e) {
-      console.warn("Servidor local indisponível, utilizando produtos locais embutidos:", e.message);
-    }
-  }
-
-  // Se obtivemos o CSV por fetch local:
-  if (csvText) {
-    if (typeof Papa !== "undefined") {
-      const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-      products = parsed.data.map((row, index) => {
-        const imageUrl = row.imagem || row.image || "";
-        const priceStr = (row.preco || row.price || "0")
-          .toString()
-          .trim()
-          .replace("R$", "")
-          .replace(/\s+/g, "")
-          .replace(",", ".");
-
-        let catFormatted = row.categoria || row.category || "Geral";
-        if (catFormatted) {
-          catFormatted = catFormatted.trim();
-          catFormatted = catFormatted.charAt(0).toUpperCase() + catFormatted.slice(1).toLowerCase();
-        }
-
-        return {
-          id: parseInt(row.id) || index + 1,
-          name: row.nome || row.name || `Item ${index + 1}`,
-          category: catFormatted,
-          price: parseFloat(priceStr) || 0,
-          description: row.descricao || row.description || row.desc || "",
-          image: convertDriveLink(imageUrl),
-        };
-      });
-    } else {
-      products = parseCSV(csvText);
-    }
+// Helper: parseia CSV bruto (PapaParse ou fallback manual) → array de produtos normalizados
+function parseCsvToProducts(csvText) {
+  let rows;
+  if (typeof Papa !== "undefined") {
+    const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+    rows = parsed.data;
   } else {
-    // Usar os produtos da pasta do projeto pré-carregados (para protocolo file://)
-    console.log("✅ Cardápio carregado dos dados locais do projeto.");
-    products = EMBEDDED_PRODUCTS;
+    rows = parseCSV(csvText);
+    return rows; // parseCSV já retorna formato normalizado
   }
 
+  return rows.map((rawRow, index) => {
+    const row = {};
+    Object.keys(rawRow).forEach((k) => {
+      if (k) row[k.trim().toLowerCase()] = rawRow[k];
+    });
+
+    const imageUrl = row.imagem || row.image || "";
+    const priceStr = (row.preco || row.price || "0")
+      .toString().trim()
+      .replace("R$", "").replace(/\s+/g, "").replace(",", ".");
+
+    let catFormatted = row.categoria || row.category || "Geral";
+    if (catFormatted) {
+      catFormatted = catFormatted.trim();
+      catFormatted = catFormatted.charAt(0).toUpperCase() + catFormatted.slice(1).toLowerCase();
+    }
+
+    return {
+      id: parseInt(row.id) || index + 1000,
+      name: row.nome || row.name || `Item ${index + 1}`,
+      category: catFormatted,
+      price: parseFloat(priceStr) || 0,
+      description: row.desc || row.descricao || row.description || "",
+      image: convertDriveLink(imageUrl),
+    };
+  });
+}
+
+// Estratégia Stale-While-Revalidate:
+//   1. Renderiza IMEDIATAMENTE com EMBEDDED_PRODUCTS (zero delay)
+//   2. Busca Google Sheets em background (silenciosamente)
+//   3. Quando chegar → re-renderiza com dados atualizados da planilha
+//   4. Se falhar (offline, file://, timeout) → mantém o que já está na tela
+async function loadSheetData() {
+  // — FASE 1: Render imediato com dados embutidos (instantâneo) —
+  products = EMBEDDED_PRODUCTS;
   renderCategories();
   filterProducts();
+  console.log(`✅ Cardápio renderizado instantaneamente (${products.length} produtos embutidos).`);
+
+  // — FASE 2: Busca assíncrona em background do Google Sheets —
+  fetchSheetInBackground();
+}
+
+async function fetchSheetInBackground() {
+  try {
+    const t0 = performance.now();
+    const response = await fetch(SHEETS_CSV_URL, {
+      // cache: 'no-store' garante dados frescos da planilha a cada visita
+      cache: "no-store",
+      signal: AbortSignal.timeout(8000), // timeout de 8s — se demorar mais, desiste
+    });
+
+    if (!response.ok) {
+      console.warn(`⚠️ Google Sheets retornou HTTP ${response.status}. Mantendo dados embutidos.`);
+      return;
+    }
+
+    const csvText = await response.text();
+    const elapsed = (performance.now() - t0).toFixed(0);
+
+    if (!csvText || csvText.trim().startsWith("<!DOCTYPE")) {
+      console.warn("⚠️ Resposta do Google Sheets não é CSV válido. Mantendo dados embutidos.");
+      return;
+    }
+
+    const freshProducts = parseCsvToProducts(csvText);
+    if (!freshProducts || freshProducts.length === 0) {
+      console.warn("⚠️ Nenhum produto parseado da planilha. Mantendo dados embutidos.");
+      return;
+    }
+
+    // Atualiza silenciosamente — re-renderiza apenas se a categoria ativa ainda existir
+    products = freshProducts;
+    const activeCatStillExists = products.some(
+      (p) => p.category.toLowerCase() === activeCategory.toLowerCase()
+    );
+    if (!activeCatStillExists) activeCategory = products[0]?.category || "Espetos";
+
+    renderCategories();
+    filterProducts();
+    console.log(`🔄 Cardápio atualizado da planilha Google Sheets em ${elapsed}ms (${products.length} produtos).`);
+
+  } catch (e) {
+    if (e.name === "TimeoutError") {
+      console.warn("⏱️ Timeout ao buscar planilha (>8s). Mantendo dados embutidos.");
+    } else {
+      console.warn("⚠️ Não foi possível buscar a planilha:", e.message, "— Mantendo dados embutidos.");
+    }
+  }
 }
 
 function renderCategories() {
@@ -264,7 +304,8 @@ function renderCategories() {
   if (categoriesContainer) {
     categoriesContainer.innerHTML = categoriesList
       .map((cat) => {
-        const displayLabel = cat.toLowerCase() === "porcoes" ? "Porções" : cat;
+        const rawLabel = cat.toLowerCase() === "porcoes" ? "Porções" : cat;
+        const displayLabel = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1).toLowerCase();
         const isActive = cat.toLowerCase() === activeCategory.toLowerCase();
 
         return `
