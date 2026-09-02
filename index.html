@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Summer Sport Bar - Cardápio Digital</title>
-    <!-- Tailwind CSS & Fontes -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Fontes & Ícones -->
     <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
       rel="stylesheet"
@@ -15,351 +15,96 @@
       rel="stylesheet"
     />
 
-    <!-- Biblioteca para converter CSV e GSAP + ScrollTrigger para Animações e Transições -->
+    <!-- Design System Global (Tokens, Dark/Light Mode, Componentes) -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- Bibliotecas de Suporte (PapaParse para CSV e GSAP para Transições) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              background: "#121619",
-              "card-bg": "#1A2228",
-              "primary-container": "#33B4C9",
-              "secondary-container": "#EE792C",
-              "surface-container": "#1E272E",
-              "teal-bright": "#33B4C9",
-              black: "#000000",
-              white: "#FFFFFF",
-            },
-            fontFamily: {
-              anybody: ["Anybody", "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      html {
-        scroll-behavior: smooth;
-      }
-      body {
-        background-color: #121619;
-        color: #fefadf;
-        font-family: "Anybody", sans-serif;
-        min-height: 100dvh;
-      }
-      .material-symbols-outlined {
-        font-variation-settings:
-          "FILL" 1,
-          "wght" 800,
-          "GRAD" 0,
-          "opsz" 24;
-      }
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-
-      /* ===== BADGES DE PROMOÇÃO ===== */
-      .promo-badge-tag {
-        position: absolute;
-        top: -15px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-        font-family: "Anybody", sans-serif;
-        font-weight: 900;
-        font-size: 8px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        padding: 5px 14px;
-        border-radius: 999px;
-        border: 2px solid #000;
-        white-space: nowrap;
-        /* Fallback base */
-        background: #EE792C;
-        color: #000;
-        box-shadow: 2px 2px 0px 0px #000;
-        animation: promo-float 2.4s ease-in-out infinite;
-      }
-
-      /* Quarta-Feira — brasa quente */
-      .promo-badge-tag.badge-quarta {
-        background: linear-gradient(105deg, #FF4500 0%, #EE792C 45%, #FFB347 100%);
-        color: #000;
-        box-shadow: 2px 2px 0px 0px #000, 0 0 10px rgba(255, 80, 0, 0.55);
-        animation: promo-fire 2s ease-in-out infinite;
-      }
-
-      /* Quinta-Feira — teal refrescante */
-      .promo-badge-tag.badge-quinta {
-        background: linear-gradient(105deg, #0BBCD4 0%, #33B4C9 50%, #4DD9EC 100%);
-        color: #000;
-        box-shadow: 2px 2px 0px 0px #000, 0 0 10px rgba(51, 180, 201, 0.45);
-        animation: promo-teal 2.2s ease-in-out infinite;
-      }
-
-      /* Noturno — roxo meia-noite */
-      .promo-badge-tag.badge-noturno {
-        background: linear-gradient(105deg, #4A00E0 0%, #7B52FF 50%, #A78BFA 100%);
-        color: #fff;
-        box-shadow: 2px 2px 0px 0px #000, 0 0 10px rgba(123, 82, 255, 0.5);
-        animation: promo-night 2.6s ease-in-out infinite;
-      }
-
-      /* Animações de pulsação por tema */
-      @keyframes promo-float {
-        0%, 100% { transform: translateX(-50%) translateY(0); }
-        50%       { transform: translateX(-50%) translateY(-2px); }
-      }
-      @keyframes promo-fire {
-        0%, 100% {
-          transform: translateX(-50%) translateY(0);
-          box-shadow: 2px 2px 0px 0px #000, 0 0 8px rgba(255,80,0,0.4);
-        }
-        50% {
-          transform: translateX(-50%) translateY(-2px);
-          box-shadow: 2px 2px 0px 0px #000, 0 0 16px rgba(255,80,0,0.75);
-        }
-      }
-      @keyframes promo-teal {
-        0%, 100% {
-          transform: translateX(-50%) translateY(0);
-          box-shadow: 2px 2px 0px 0px #000, 0 0 8px rgba(51,180,201,0.3);
-        }
-        50% {
-          transform: translateX(-50%) translateY(-2px);
-          box-shadow: 2px 2px 0px 0px #000, 0 0 14px rgba(51,180,201,0.65);
-        }
-      }
-      @keyframes promo-night {
-        0%, 100% {
-          transform: translateX(-50%) translateY(0);
-          box-shadow: 2px 2px 0px 0px #000, 0 0 8px rgba(123,82,255,0.35);
-        }
-        50% {
-          transform: translateX(-50%) translateY(-2px);
-          box-shadow: 2px 2px 0px 0px #000, 0 0 16px rgba(123,82,255,0.7);
-        }
-      }
-
-      /* Card em promoção: borda temática por tipo */
-      .promo-card { border-color: #EE792C !important; }
-      .promo-card:has(.badge-quarta) {
-        border-color: #FF4500 !important;
-        box-shadow: 4px 4px 0px 0px #000, 0 0 14px rgba(255,80,0,0.2) !important;
-      }
-
-      /* ===== FOOTER PREMIUM ===== */
-      .footer-premium {
-        background: linear-gradient(175deg, #1A2228 0%, #131C22 50%, #0D1318 100%);
-        border-top: 4px solid #000;
-        color: #fff;
-      }
-      .footer-accent-line {
-        height: 3px;
-        background: linear-gradient(90deg, transparent 0%, #FF4500 20%, #EE792C 50%, #FF4500 80%, transparent 100%);
-      }
-      .footer-logo {
-        filter: drop-shadow(0 4px 16px rgba(238,121,44,0.35));
-        transition: filter 0.3s ease;
-      }
-      .footer-logo:hover { filter: drop-shadow(0 4px 24px rgba(238,121,44,0.6)); }
-      .footer-tagline {
-        font-family: "Anybody", sans-serif;
-        font-weight: 700;
-        font-size: 11px;
-        letter-spacing: 0.3em;
-        text-transform: uppercase;
-        color: #6B7280;
-      }
-      .footer-divider-line { height: 1px; width: 80px; }
-      .footer-col-title {
-        font-family: "Anybody", sans-serif;
-        font-weight: 900;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.2em;
-        color: #33B4C9;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid rgba(51,180,201,0.2);
-      }
-      .footer-maps-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-family: "Anybody", sans-serif;
-        font-weight: 900;
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.15em;
-        color: #EE792C;
-        border: 1px solid rgba(238,121,44,0.35);
-        padding: 6px 12px;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-        width: fit-content;
-        text-decoration: none;
-      }
-      .footer-maps-btn:hover {
-        background: rgba(238,121,44,0.12);
-        border-color: rgba(238,121,44,0.7);
-        transform: translateY(-1px);
-      }
-      .footer-wpp-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        font-family: "Anybody", sans-serif;
-        font-weight: 900;
-        font-size: 15px;
-        color: #000;
-        background: linear-gradient(135deg, #25D366 0%, #1db954 100%);
-        padding: 14px 20px;
-        border-radius: 16px;
-        border: 3px solid #000;
-        box-shadow: 4px 4px 0px 0px #000;
-        transition: all 0.18s ease;
-        width: 100%;
-        text-decoration: none;
-      }
-      .footer-wpp-btn:hover {
-        transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0px 0px #000;
-        background: linear-gradient(135deg, #2be173 0%, #25D366 100%);
-      }
-      .footer-wpp-btn:active {
-        transform: translate(1px, 1px);
-        box-shadow: 2px 2px 0px 0px #000;
-      }
-      .footer-status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-family: "Anybody", sans-serif;
-        font-weight: 900;
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.15em;
-        padding: 6px 12px;
-        border-radius: 999px;
-        border: 1px solid;
-        width: fit-content;
-      }
-      .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-      .status-dot.open  { background: #4ADE80; animation: dot-pulse-green 1.6s ease-in-out infinite; }
-      .status-dot.closed { background: #F87171; }
-      @keyframes dot-pulse-green {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.5); }
-        50%       { box-shadow: 0 0 0 5px rgba(74,222,128,0); }
-      }
-      .footer-bottom-bar {
-        background: rgba(0,0,0,0.3);
-        border-top: 1px solid rgba(0,0,0,0.5);
-      }
-      .promo-card:has(.badge-quinta) {
-        border-color: #33B4C9 !important;
-        box-shadow: 4px 4px 0px 0px #000, 0 0 14px rgba(51,180,201,0.2) !important;
-      }
-      .promo-card:has(.badge-noturno) {
-        border-color: #7B52FF !important;
-        box-shadow: 4px 4px 0px 0px #000, 0 0 14px rgba(123,82,255,0.2) !important;
-      }
-    </style>
   </head>
-  <body class="pb-12 text-white bg-[#121619]">
-    <!-- Header Fixo Topo (Dark Mode) -->
-    <header
-      class="bg-[#1A2228] w-full sticky top-0 z-50 border-b-[4px] border-black flex justify-between items-center px-4 md:px-8 h-24 shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
-    >
+  <body>
+    <!-- Header Fixo Topo -->
+    <header class="app-header">
       <button
         id="menu-btn"
-        class="w-11 h-11 border-[3px] border-black bg-[#EE792C] text-black rounded-full flex items-center justify-center shadow-[3px_3px_0px_0px_#000000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex-shrink-0"
+        class="header-menu-btn"
         title="Categorias"
+        aria-label="Abrir Menu de Categorias"
       >
-        <span class="material-symbols-outlined text-2xl">menu</span>
+        <span class="material-symbols-outlined" style="font-size: 24px">menu</span>
       </button>
 
-      <!-- Logo SVG em substituição ao título de texto -->
-      <div class="flex items-center justify-center h-full py-2">
+      <!-- Logo SVG Oficial Centralizado -->
+      <div class="header-logo-container">
         <img
           src="SummerBeachSportsBarVazado.svg"
           alt="Summer Sport Bar"
-          class="h-16 md:h-20 w-auto object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+          class="header-logo-img"
         />
       </div>
 
-      <!-- Div fantasma para centralização perfeita do logo no flex container -->
-      <div class="w-11 h-11 flex-shrink-0"></div>
+      <!-- Espaçador para balanceamento simétrico do Header -->
+      <div class="header-spacer"></div>
     </header>
 
     <!-- Conteúdo Principal -->
-    <main class="container mx-auto px-3 sm:px-4 py-6 max-w-6xl">
+    <main class="main-container">
       
       <!-- Título do Menu -->
-      <h3 class="font-black text-2xl uppercase tracking-wider mb-4 text-[#EE792C] drop-shadow-[2px_2px_0px_#000]">
+      <h3 class="section-title">
         Cardápio
       </h3>
 
-      <!-- Filtros de Categorias (Scrollável com suporte a Snap e Drag) -->
-      <div
-        class="flex gap-2.5 overflow-x-auto pb-4 mb-6 scroll-smooth snap-x snap-mandatory focus:outline-none"
+      <!-- Barra de Categorias Scrollável com Snap -->
+      <nav
+        class="categories-container no-scrollbar"
         id="categories-container"
-      ></div>
+        aria-label="Navegação por categorias"
+      ></nav>
 
-      <!-- Lista de Produtos: 2 colunas no Mobile (grid-cols-2) e responsivo para telas maiores -->
-      <div id="products-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-        <p class="font-bold text-gray-400 col-span-full text-center py-8">
-          Carregando itens da planilha...
+      <!-- Grade de Produtos Responsiva -->
+      <section id="products-grid" class="products-grid" aria-live="polite">
+        <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 2rem; font-weight: bold;">
+          Carregando cardápio...
         </p>
-      </div>
+      </section>
     </main>
 
-    <!-- Footer Premium do Summer Sport Bar -->
-    <footer class="w-full mt-12 relative overflow-hidden footer-premium">
+    <!-- Footer Premium -->
+    <footer class="footer-premium">
 
-      <!-- Accent line topo com gradiente laranja -->
+      <!-- Linha de Acento Temática -->
       <div class="footer-accent-line"></div>
 
       <!-- Seção do Logo Centralizado -->
-      <div class="text-center pt-10 pb-6 px-4">
+      <div style="text-align: center; padding: 2.5rem 1rem 1.5rem 1rem;">
         <img
           src="SummerBeachSportsBarVazado.svg"
           alt="Summer Sport Bar"
-          class="h-20 w-auto mx-auto object-contain footer-logo"
+          class="footer-logo"
         />
-        <p class="footer-tagline mt-3">Beach Tennis &amp; Bar · Franca – SP</p>
+        <p class="footer-tagline">Beach Tennis &amp; Bar · Franca – SP</p>
         <!-- Separador decorativo -->
-        <div class="flex items-center justify-center gap-4 mt-5">
-          <div class="footer-divider-line" style="background: linear-gradient(to right, transparent, #EE792C);"></div>
-          <span class="text-[#EE792C] font-black text-sm">◆</span>
-          <div class="footer-divider-line" style="background: linear-gradient(to left, transparent, #EE792C);"></div>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1.25rem;">
+          <div class="footer-divider-line" style="background: linear-gradient(to right, transparent, var(--color-orange-500));"></div>
+          <span style="color: var(--color-orange-500); font-weight: 900; font-size: 14px;">◆</span>
+          <div class="footer-divider-line" style="background: linear-gradient(to left, transparent, var(--color-orange-500));"></div>
         </div>
       </div>
 
-      <!-- Três Colunas -->
-      <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-6 pb-12">
+      <!-- Grid de 3 Colunas com Informações e CTAs -->
+      <div style="max-width: 56rem; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; padding: 0 1.5rem 3rem 1.5rem;">
 
         <!-- Coluna 1: Localização -->
-        <div class="flex flex-col gap-4">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
           <h5 class="footer-col-title">
-            <span class="material-symbols-outlined" style="font-size:16px">location_on</span>
+            <span class="material-symbols-outlined" style="font-size: 16px">location_on</span>
             Localização
           </h5>
           <div>
-            <p class="text-sm font-black text-white leading-snug">Av. Hugo Betarello, 4230</p>
-            <p class="text-xs text-gray-400 font-semibold leading-relaxed mt-0.5">
+            <p style="font-size: 0.95rem; font-weight: 900; color: #FFFFFF; line-height: 1.25;">Av. Hugo Betarello, 4230</p>
+            <p style="font-size: 0.75rem; color: #9CA3AF; font-weight: 600; line-height: 1.5; margin-top: 0.25rem;">
               Parque Franville<br />Franca – SP · 14403-227
             </p>
           </div>
@@ -369,63 +114,76 @@
             rel="noopener noreferrer"
             class="footer-maps-btn"
           >
-            <span class="material-symbols-outlined" style="font-size:13px">open_in_new</span>
+            <span class="material-symbols-outlined" style="font-size: 13px">open_in_new</span>
             Ver no Google Maps
           </a>
         </div>
 
         <!-- Coluna 2: Horário & Status ao vivo -->
-        <div class="flex flex-col gap-4">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
           <h5 class="footer-col-title">
-            <span class="material-symbols-outlined" style="font-size:16px">schedule</span>
+            <span class="material-symbols-outlined" style="font-size: 16px">schedule</span>
             Horário
           </h5>
           <div>
-            <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Quarta a Sábado</p>
-            <p class="text-2xl font-black text-white mt-1 leading-none">17<span class="text-[#EE792C]">:</span>00 – 00<span class="text-[#EE792C]">:</span>00</p>
+            <p style="font-size: 0.75rem; color: #9CA3AF; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Quarta a Sábado</p>
+            <p style="font-size: 1.5rem; font-weight: 900; color: #FFFFFF; margin-top: 0.25rem; line-height: 1;">17<span style="color: var(--color-orange-500)">:</span>00 – 00<span style="color: var(--color-orange-500)">:</span>00</p>
           </div>
           <!-- Badge de Status ao vivo -->
-          <div id="footer-status" class="footer-status-badge">
-            <!-- Preenchido pelo JS -->
-          </div>
+          <div id="footer-status" class="footer-status-badge"></div>
         </div>
 
-        <!-- Coluna 3: WhatsApp -->
-        <div class="flex flex-col gap-4">
+        <!-- Coluna 3: Contato, Pedidos & Redes Sociais -->
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
           <h5 class="footer-col-title">
-            <span class="material-symbols-outlined" style="font-size:16px">chat</span>
-            Pedidos &amp; Retirada
+            <span class="material-symbols-outlined" style="font-size: 16px">chat</span>
+            Pedidos &amp; Conexão
           </h5>
-          <p class="text-xs text-gray-400 font-medium leading-relaxed">
-            Faça seu pedido ou agende sua retirada diretamente pelo WhatsApp:
-          </p>
+          
+          <!-- Botão WhatsApp -->
           <a
             href="https://wa.me/5516992911737?text=Ol%C3%A1!%20Gostaria%20de%20fazer%20um%20pedido%20no%20Summer%20Sport%20Bar."
             target="_blank"
             rel="noopener noreferrer"
             class="footer-wpp-btn"
           >
-            <span class="material-symbols-outlined" style="font-size:22px">chat</span>
+            <span class="material-symbols-outlined" style="font-size: 22px">chat</span>
             <span>
-              <span class="block text-[10px] font-bold opacity-70 tracking-widest uppercase leading-none mb-0.5">WhatsApp</span>
+              <span style="display: block; font-size: 9px; font-weight: 700; opacity: 0.8; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1; margin-bottom: 2px;">Pedidos no WhatsApp</span>
               (16) 99291-1737
+            </span>
+          </a>
+
+          <!-- Botão Instagram Oficial -->
+          <a
+            href="https://www.instagram.com/summerbeachsb/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-insta-btn"
+          >
+            <svg style="width: 20px; height: 20px; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            <span>
+              <span style="display: block; font-size: 9px; font-weight: 700; opacity: 0.8; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1; margin-bottom: 2px;">Siga no Instagram</span>
+              @summerbeachsb
             </span>
           </a>
         </div>
 
       </div>
 
-      <!-- Barra inferior com copyright e crédito -->
+      <!-- Barra Inferior com Créditos & Direitos -->
       <div class="footer-bottom-bar">
-        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-[10px] font-semibold text-gray-500 px-6 py-4">
+        <div style="max-width: 56rem; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem; font-size: 11px; font-weight: 600; color: #9CA3AF; padding: 1rem 1.5rem;">
           <p>© 2026 Summer Sport Bar · Todos os direitos reservados.</p>
-          <p class="flex items-center gap-1">
+          <p style="display: flex; align-items: center; gap: 0.25rem;">
             Desenvolvido por
             <a
               href="https://github.com/jricardogoulart"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-[#33B4C9] font-bold hover:text-[#EE792C] transition-colors ml-1"
+              style="color: var(--color-teal-500); font-weight: 800; text-decoration: none; margin-left: 0.25rem;"
             >
               @jricardogoulart
             </a>
@@ -438,43 +196,103 @@
     <!-- Modal Side Drawer de Categorias (Menu Lateral) -->
     <div
       id="menu-drawer"
-      class="fixed inset-0 bg-black/70 z-50 hidden flex justify-start transition-opacity backdrop-blur-sm"
+      class="menu-drawer hidden"
     >
       <div
         id="menu-overlay"
-        class="bg-[#1A2228] w-4/5 max-w-xs h-full border-r-[4px] border-black p-6 flex flex-col justify-between shadow-[8px_0px_0px_0px_#000000] text-white"
+        class="menu-overlay-panel"
       >
         <div>
-          <div
-            class="flex justify-between items-center border-b-[4px] border-black pb-4 mb-6"
-          >
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[#EE792C]">restaurant_menu</span>
-              <h3 class="font-black text-xl uppercase tracking-wider text-white">Categorias</h3>
+          <div class="sidebar-header">
+            <div class="sidebar-title-group">
+              <span class="material-symbols-outlined" style="color: var(--color-orange-500)">restaurant_menu</span>
+              <h3 class="sidebar-title">Categorias</h3>
             </div>
             <button
               id="close-menu"
-              class="w-8 h-8 border-2 border-black bg-[#EE792C] text-black rounded-full font-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+              class="sidebar-close-btn"
+              aria-label="Fechar menu lateral"
             >
-              <span class="material-symbols-outlined" style="font-size:18px">close</span>
+              <span class="material-symbols-outlined" style="font-size: 18px">close</span>
             </button>
+          </div>
+
+          <!-- Seletor de Tema (Dark / Light / Auto) -->
+          <div class="sidebar-theme-wrapper">
+            <span class="sidebar-theme-label">Aparência do Cardápio</span>
+            <div class="theme-toggle-group" role="group" aria-label="Seletor de Modo Escuro e Claro">
+              <button
+                type="button"
+                id="theme-dark-btn"
+                class="theme-toggle-btn active"
+                onclick="setAppTheme('dark')"
+                title="Modo Escuro"
+              >
+                <span class="material-symbols-outlined" style="font-size: 15px;">dark_mode</span>
+                <span>Escuro</span>
+              </button>
+              <button
+                type="button"
+                id="theme-light-btn"
+                class="theme-toggle-btn"
+                onclick="setAppTheme('light')"
+                title="Modo Claro"
+              >
+                <span class="material-symbols-outlined" style="font-size: 15px;">light_mode</span>
+                <span>Claro</span>
+              </button>
+              <button
+                type="button"
+                id="theme-auto-btn"
+                class="theme-toggle-btn"
+                onclick="setAppTheme('auto')"
+                title="Automático (Dispositivo)"
+              >
+                <span class="material-symbols-outlined" style="font-size: 15px;">devices</span>
+                <span>Auto</span>
+              </button>
+            </div>
           </div>
 
           <!-- Lista de atalhos das categorias -->
           <div
             id="sidebar-categories"
-            class="flex flex-col gap-3"
+            class="sidebar-categories-list"
           ></div>
         </div>
 
-        <div class="border-t-[4px] border-black pt-4 text-center">
-          <img src="SummerBeachSportsBarVazado.svg" alt="Summer Sport Bar" class="h-12 w-auto mx-auto mb-2 opacity-90" />
-          <p class="font-black text-xs uppercase tracking-widest text-gray-400">Summer Sport Bar</p>
-          <p class="text-[10px] font-bold text-gray-500">Lounge & Bar</p>
+        <div class="sidebar-footer">
+          <img src="SummerBeachSportsBarVazado.svg" alt="Summer Sport Bar" class="sidebar-footer-logo" />
+          <p style="font-family: var(--font-family-sans); font-weight: 900; font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted);">Summer Sport Bar</p>
+          <p style="font-size: 10px; font-weight: 700; color: var(--text-muted); opacity: 0.75;">Beach Tennis &amp; Bar</p>
         </div>
       </div>
     </div>
 
+    <!-- Pop-up Modal de Detalhes do Produto (Visualização Ampliada) -->
+    <div
+      id="product-modal"
+      class="product-modal-backdrop hidden"
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div id="product-modal-dialog" class="product-modal-dialog">
+        <!-- Botão Fechar -->
+        <button
+          id="close-product-modal"
+          class="product-modal-close-btn"
+          aria-label="Fechar pop-up"
+        >
+          <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+        </button>
+
+        <!-- Conteúdo Renderizado Dinamicamente -->
+        <div id="product-modal-content"></div>
+      </div>
+    </div>
+
+    <!-- Script Principal -->
     <script src="script.js"></script>
   </body>
 </html>

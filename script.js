@@ -125,7 +125,7 @@ const EMBEDDED_PRODUCTS = [
   { id: 33, category: "Cervejas", name: "Skol Beats Sense 269ml", description: "Lata 269ml", price: 9.90, image: convertDriveLink("https://drive.google.com/file/d/16bV4CUDSesxF-lE0BoTtNXUUVGOPdslg/view?usp=drive_link") },
   { id: 34, category: "Cervejas", name: "Heineken Zero Long Neck", description: "Sem álcool", price: 8.90, image: convertDriveLink("https://drive.google.com/file/d/10--FOecVzIem7ywscuj6M2wPxyNmFS93/view?usp=drive_link") },
   { id: 35, category: "Cervejas", name: "Michelob Long Neck", description: "Long neck gelada", price: 9.90, image: convertDriveLink("https://drive.google.com/file/d/11blCd1Flenj5WGO8ysPCZ63k4iRl7SvG/view?usp=drive_link") },
-  { id: 36, category: "Cervejas", name: "Chopp Caneca 300ml", description: "Chopp Pilsen Palazzo", price: 3.40, image: convertDriveLink("https://drive.google.com/file/d/1ZS021C_dJKbjRhsa7mK6ZYzoJc-DjKxz/view?usp=drive_link") },
+  { id: 36, category: "Cervejas", name: "Chopp Caneca 300ml", description: "Chopp Pilsen Palazzo", price: 6.90, image: convertDriveLink("https://drive.google.com/file/d/1ZS021C_dJKbjRhsa7mK6ZYzoJc-DjKxz/view?usp=drive_link") },
   { id: 37, category: "Cervejas", name: "Stella Pure Gold", description: "Sem glúten", price: 9.90, image: convertDriveLink("https://drive.google.com/file/d/1c6EpwVhLhwAHUihJqNTZPRnVkj3LQ648/view?usp=drive_link") },
   { id: 38, category: "Cervejas", name: "Império Lager 600", description: "Garrafa 600ml", price: 9.90, image: convertDriveLink("https://drive.google.com/file/d/1NypcSwaKsnr1iq_Yp4SiB7bJ0B8wKoUT/view?usp=drive_link") },
   { id: 39, category: "Cervejas", name: "Antarctica 600ml", description: "Garrafa 600ml", price: 10.90, image: convertDriveLink("https://drive.google.com/file/d/1fJ8rwPm2xIMsHAUNOnY4M-UTJfD0SHXe/view?usp=drive_link") },
@@ -268,11 +268,7 @@ function renderCategories() {
         const isActive = cat.toLowerCase() === activeCategory.toLowerCase();
 
         return `
-      <button id="cat-btn-${cat.toLowerCase()}" class="${
-        isActive
-          ? "bg-[#EE792C] text-black border-[3px] border-black shadow-[3px_3px_0px_0px_#000000]"
-          : "bg-[#1A2228] text-white border-[3px] border-black hover:bg-[#26323A]"
-      } rounded-xl px-4 py-2 font-black uppercase text-sm whitespace-nowrap snap-start active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex-shrink-0 cursor-pointer" onclick="filterCategory('${cat}')">
+      <button id="cat-btn-${cat.toLowerCase()}" class="cat-btn ${isActive ? "active" : ""}" onclick="filterCategory('${cat}')">
         ${displayLabel}
       </button>
     `;
@@ -290,12 +286,8 @@ function renderCategories() {
         const icon = categoryIcons[cat.toLowerCase()] || "category";
 
         return `
-      <button onclick="selectCategoryFromSidebar('${cat}')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border-[3px] border-black font-black uppercase text-sm transition-all ${
-        isActive
-          ? "bg-[#EE792C] text-black shadow-[4px_4px_0px_0px_#000000]"
-          : "bg-[#253038] text-white hover:bg-[#33424d] shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
-      }">
-        <span class="material-symbols-outlined text-lg">${icon}</span>
+      <button onclick="selectCategoryFromSidebar('${cat}')" class="sidebar-cat-btn ${isActive ? "active" : ""}">
+        <span class="material-symbols-outlined" style="font-size: 20px;">${icon}</span>
         <span>${displayLabel}</span>
       </button>
     `;
@@ -353,9 +345,10 @@ function getActivePromos() {
     promos[20] = { promoPrice: 22.90, promoLabel: "◆ QUINTA PROMO ◆", badgeClass: "badge-quinta" };
   }
 
-  // === TODO DIA APÓS AS 00:00 → Chopp a R$ 6,90 ===
-  if (hour >= 0 && hour < 6) {
-    promos[36] = { promoPrice: 6.90, promoLabel: "CHOPP NOTURNO", badgeClass: "badge-noturno" };
+  // === TODOS OS DIAS (Antes das 00:00) → Chopp a R$ 3,40 com Tag Promo ===
+  // Após as 00:00 (entre 00:00 e 05:59), a tag é removida e o valor fica R$ 6,90
+  if (!(hour >= 0 && hour < 6)) {
+    promos[36] = { promoPrice: 3.40, promoLabel: "CHOPP PROMO", badgeClass: "badge-chopp" };
   }
 
   return promos;
@@ -365,7 +358,7 @@ function renderProducts(items) {
   if (!productsGrid) return;
 
   if (items.length === 0) {
-    productsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #9CA3AF; padding: 2rem; font-weight: bold;">Nenhum item encontrado nesta categoria.</p>`;
+    productsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 2rem; font-weight: bold;">Nenhum item encontrado nesta categoria.</p>`;
     return;
   }
 
@@ -383,35 +376,36 @@ function renderProducts(items) {
       const displayPrice = hasPromo ? promo.promoPrice : item.price;
 
       return `
-    <div class="product-card-item bg-[#1A2228] border-[3px] border-black rounded-2xl p-3 sm:p-4 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between transition-transform hover:-translate-y-1 relative${hasPromo ? ' promo-card' : ''}">
+    <div class="product-card-item${hasPromo ? ' promo-card' : ''}" onclick="openProductModal(${item.id})" role="button" tabindex="0" aria-label="Ver detalhes de ${item.name}">
       ${hasPromo ? `
         <div class="promo-badge-tag ${promo.badgeClass || ''}">${promo.promoLabel}</div>
       ` : ''}
       ${
         item.image
           ? `
-        <div class="w-full aspect-[3/4] bg-[#253038] border-[2px] border-black rounded-xl overflow-hidden mb-2.5 relative flex items-center justify-center">
+        <div class="product-card-image-box">
           <img src="${item.image}" alt="${item.name}" 
-               class="w-full h-full object-cover" 
-               onerror="this.style.display='none'; this.parentElement.classList.add('flex','items-center','justify-center','p-4'); this.parentElement.innerHTML='<span class=&quot;text-xs font-bold text-gray-400 uppercase text-center&quot;>Summer Sport Bar</span>'">
-          <span class="absolute top-2 right-2 bg-[#EE792C] border-[2px] border-black text-black font-black text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider shadow-[1px_1px_0px_0px_#000]">${item.category}</span>
+               class="product-card-img" 
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center;&quot;>Summer Sport Bar</span>'">
+          <span class="product-card-category-tag">${item.category}</span>
         </div>
       `
           : ""
       }
-      <div class="flex-1 mb-2">
-        <h3 class="font-black text-sm sm:text-base uppercase tracking-tight text-white leading-snug">${item.name}</h3>
-        ${item.description ? `<p class="text-[11px] sm:text-xs font-medium text-gray-300 mt-1 line-clamp-3">${item.description}</p>` : ""}
+      <div class="product-card-body">
+        <h4 class="product-card-title">${item.name}</h4>
+        ${item.description ? `<p class="product-card-desc">${item.description}</p>` : ""}
       </div>
-      <div class="flex justify-between items-center pt-2 border-t-[2px] border-black/80 mt-auto">
+      <div class="product-card-footer">
         ${hasPromo ? `
-          <div class="flex flex-col">
-            <span class="line-through text-gray-500 text-xs font-semibold">R$ ${item.price.toFixed(2).replace(".", ",")}</span>
-            <span class="font-black text-base sm:text-lg text-[#EE792C]">R$ ${displayPrice.toFixed(2).replace(".", ",")}</span>
+          <div style="display: flex; flex-direction: column;">
+            <span class="product-price-old">R$ ${item.price.toFixed(2).replace(".", ",")}</span>
+            <span class="product-price-promo">R$ ${displayPrice.toFixed(2).replace(".", ",")}</span>
           </div>
-          <span class="text-[10px] font-black uppercase tracking-wider text-[#EE792C] bg-[#EE792C]/10 border border-[#EE792C]/50 px-2 py-1 rounded-lg">PROMO</span>
+          <span class="product-mini-promo-pill">PROMO</span>
         ` : `
-          <span class="font-black text-base sm:text-lg text-[#33B4C9]">R$ ${displayPrice.toFixed(2).replace(".", ",")}</span>
+          <span class="product-price-regular">R$ ${displayPrice.toFixed(2).replace(".", ",")}</span>
         `}
       </div>
     </div>
@@ -423,9 +417,115 @@ function renderProducts(items) {
   if (typeof gsap !== "undefined") {
     gsap.fromTo(
       ".product-card-item",
-      { opacity: 0, y: 20, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.35, stagger: 0.05, ease: "back.out(1.2)" }
+      { opacity: 0, y: 16, scale: 0.96 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.3, stagger: 0.04, ease: "power2.out" }
     );
+  }
+
+  // Recalcula alturas de scroll caso o DOM tenha mudado de tamanho
+  if (typeof ScrollTrigger !== "undefined") {
+    ScrollTrigger.refresh();
+  }
+}
+
+// Pop-up Modal de Detalhes do Produto (Visualização Ampliada)
+function openProductModal(id) {
+  const item = products.find((p) => p.id === id);
+  if (!item) return;
+
+  const modal = document.getElementById("product-modal");
+  const modalContent = document.getElementById("product-modal-content");
+  if (!modal || !modalContent) return;
+
+  const activePromos = getActivePromos();
+  const promo = activePromos[item.id];
+  const hasPromo = !!promo;
+  const displayPrice = hasPromo ? promo.promoPrice : item.price;
+  const wppText = encodeURIComponent(`Olá! Gostaria de pedir: *${item.name}* (${item.category}) no Summer Sport Bar.`);
+
+  modalContent.innerHTML = `
+    ${
+      item.image
+        ? `
+      <div class="product-modal-image-wrapper">
+        ${hasPromo ? `<div class="promo-badge-tag ${promo.badgeClass || ''}" style="top: 12px; left: 50%;">${promo.promoLabel}</div>` : ''}
+        <img src="${item.image}" alt="${item.name}" class="product-modal-img" onerror="this.parentElement.style.display='none'">
+        <span class="product-modal-badge">${item.category}</span>
+      </div>
+    `
+        : ""
+    }
+    <div class="product-modal-info">
+      <div>
+        <h3 class="product-modal-title">${item.name}</h3>
+        ${item.description ? `<p class="product-modal-description" style="margin-top: 0.5rem;">${item.description}</p>` : ""}
+      </div>
+
+      <div class="product-modal-price-box">
+        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">Valor</span>
+        ${hasPromo ? `
+          <div style="text-align: right; display: flex; align-items: baseline; gap: 0.5rem;">
+            <span class="product-price-old">R$ ${item.price.toFixed(2).replace(".", ",")}</span>
+            <span class="product-price-promo" style="font-size: 1.25rem;">R$ ${displayPrice.toFixed(2).replace(".", ",")}</span>
+          </div>
+        ` : `
+          <span class="product-price-regular" style="font-size: 1.25rem;">R$ ${displayPrice.toFixed(2).replace(".", ",")}</span>
+        `}
+      </div>
+
+      <a
+        href="https://wa.me/5516992911737?text=${wppText}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="product-modal-cta-btn"
+      >
+        <span class="material-symbols-outlined" style="font-size: 20px;">chat</span>
+        <span>Pedir pelo WhatsApp</span>
+      </a>
+    </div>
+  `;
+
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden"; // Bloqueia scroll de fundo
+
+  if (typeof gsap !== "undefined") {
+    gsap.fromTo(
+      modal,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.2, ease: "power2.out" }
+    );
+    gsap.fromTo(
+      "#product-modal-dialog",
+      { scale: 0.85, y: 25, opacity: 0 },
+      { scale: 1, y: 0, opacity: 1, duration: 0.35, ease: "back.out(1.4)" }
+    );
+  }
+}
+
+function closeProductModal() {
+  const modal = document.getElementById("product-modal");
+  if (!modal || modal.classList.contains("hidden")) return;
+
+  document.body.style.overflow = ""; // Restaura scroll
+
+  if (typeof gsap !== "undefined") {
+    gsap.to("#product-modal-dialog", {
+      scale: 0.9,
+      y: 15,
+      opacity: 0,
+      duration: 0.2,
+      ease: "power2.in"
+    });
+    gsap.to(modal, {
+      opacity: 0,
+      duration: 0.2,
+      ease: "power2.in",
+      onComplete: () => {
+        modal.classList.add("hidden");
+      }
+    });
+  } else {
+    modal.classList.add("hidden");
   }
 }
 
@@ -438,6 +538,11 @@ function filterCategory(cat) {
   const activeBtn = document.getElementById(`cat-btn-${cat.toLowerCase()}`);
   if (activeBtn) {
     activeBtn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }
+
+  // Garante que o footer e a página atualizem suas dimensões
+  if (typeof ScrollTrigger !== "undefined") {
+    ScrollTrigger.refresh();
   }
 }
 
@@ -454,72 +559,12 @@ function filterProducts() {
   renderProducts(filtered);
 }
 
-function addToCart(id) {
-  const item = products.find((p) => p.id === id);
-  const existing = cart.find((p) => p.id === id);
-
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({ ...item, quantity: 1 });
-  }
-
-  updateCartUI();
-}
-
-function updateQuantity(id, change) {
-  const index = cart.findIndex((p) => p.id === id);
-  if (index !== -1) {
-    cart[index].quantity += change;
-    if (cart[index].quantity <= 0) {
-      cart.splice(index, 1);
-    }
-  }
-  updateCartUI();
-}
-
-function updateCartUI() {
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  if (cartBadge) cartBadge.textContent = totalItems;
-
-  if (!cartItemsContainer) return;
-
-  if (cart.length === 0) {
-    cartItemsContainer.innerHTML = `<p style="text-align: center; color: var(--neutral-500); margin-top: 2rem;">Sua sacola está vazia.</p>`;
-    if (cartTotalPrice) cartTotalPrice.textContent = "R$ 0,00";
-    return;
-  }
-
-  cartItemsContainer.innerHTML = cart
-    .map(
-      (item) => `
-    <div class="cart-item">
-      <div class="cart-item-details">
-        <h4>${item.name}</h4>
-        <span>R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}</span>
-      </div>
-      <div class="cart-item-actions">
-        <button onclick="updateQuantity(${item.id}, -1)">-</button>
-        <span>${item.quantity}</span>
-        <button onclick="updateQuantity(${item.id}, 1)">+</button>
-      </div>
-    </div>
-  `,
-    )
-    .join("");
-
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  if (cartTotalPrice)
-    cartTotalPrice.textContent = `R$ ${total.toFixed(2).replace(".", ",")}`;
-}
-
 function setupEvents() {
   if (searchInput) searchInput.addEventListener("input", filterProducts);
   
   // Elementos do Menu Lateral (Categorias)
   const menuBtn = document.getElementById("menu-btn");
   const menuDrawer = document.getElementById("menu-drawer");
-  const menuOverlay = document.getElementById("menu-overlay");
   const closeMenuBtn = document.getElementById("close-menu");
 
   function openMenuDrawer() {
@@ -529,7 +574,7 @@ function setupEvents() {
       gsap.fromTo(
         "#menu-overlay",
         { x: "-100%" },
-        { x: "0%", duration: 0.35, ease: "power3.out" }
+        { x: "0%", duration: 0.3, ease: "power3.out" }
       );
     }
   }
@@ -560,40 +605,92 @@ function setupEvents() {
 
   if (closeMenuBtn) closeMenuBtn.addEventListener("click", closeMenuDrawer);
 
-  // Animação leve ao rolar a página com GSAP ScrollTrigger
+  // Elementos do Pop-up Modal de Produto
+  const productModal = document.getElementById("product-modal");
+  const closeProductModalBtn = document.getElementById("close-product-modal");
+
+  if (closeProductModalBtn) {
+    closeProductModalBtn.addEventListener("click", closeProductModal);
+  }
+
+  if (productModal) {
+    productModal.addEventListener("click", (e) => {
+      if (e.target === productModal) closeProductModal();
+    });
+  }
+
+  // Fecha modais com a tecla ESC
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeProductModal();
+      closeMenuDrawer();
+    }
+  });
+
+  // Efeito sutil de elevação no Header ao rolar
   if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Efeito sutil de elevação e sombra no Header ao rolar
-    gsap.to("header", {
+    gsap.to(".app-header", {
       scrollTrigger: {
         trigger: "body",
         start: "top top",
-        end: "+=100",
-        scrub: 0.5,
+        end: "+=80",
+        scrub: 0.4,
       },
-      paddingTop: "0.5rem",
-      paddingBottom: "0.5rem",
-      boxShadow: "0 8px 20px rgba(0,0,0,0.8)",
-      backgroundColor: "#161D22",
-    });
-
-    // Animação de entrada reveladora no Footer ao rolar
-    gsap.from("footer", {
-      scrollTrigger: {
-        trigger: "footer",
-        start: "top 90%",
-        toggleActions: "play none none reverse",
-      },
-      opacity: 0,
-      y: 40,
-      duration: 0.6,
-      ease: "power2.out",
+      paddingTop: "0.25rem",
+      paddingBottom: "0.25rem",
+      boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
     });
   }
 }
 
-// Inicia o carregamento
+// ==========================================================================
+// CONTROLE DE TEMA (DARK / LIGHT / AUTO)
+// ==========================================================================
+
+function setAppTheme(theme) {
+  const root = document.documentElement;
+  localStorage.setItem("summer-theme", theme);
+
+  if (theme === "dark") {
+    root.setAttribute("data-theme", "dark");
+  } else if (theme === "light") {
+    root.setAttribute("data-theme", "light");
+  } else {
+    // Auto: remove data-theme explícito para respeitar o prefers-color-scheme do dispositivo
+    root.removeAttribute("data-theme");
+  }
+
+  updateThemeButtonsUI(theme);
+}
+
+function updateThemeButtonsUI(activeTheme) {
+  const darkBtn = document.getElementById("theme-dark-btn");
+  const lightBtn = document.getElementById("theme-light-btn");
+  const autoBtn = document.getElementById("theme-auto-btn");
+
+  if (darkBtn) darkBtn.classList.toggle("active", activeTheme === "dark");
+  if (lightBtn) lightBtn.classList.toggle("active", activeTheme === "light");
+  if (autoBtn) autoBtn.classList.toggle("active", activeTheme === "auto");
+}
+
+function initTheme() {
+  const savedTheme = localStorage.getItem("summer-theme") || "auto";
+  setAppTheme(savedTheme);
+
+  // Ouve mudanças em tempo real nas preferências de tema do sistema operacional
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
+  mediaQuery.addEventListener("change", () => {
+    const current = localStorage.getItem("summer-theme") || "auto";
+    if (current === "auto") {
+      setAppTheme("auto");
+    }
+  });
+}
+
+// Inicia o carregamento e configuração
+initTheme();
 loadSheetData();
 setupEvents();
 
@@ -612,22 +709,21 @@ function updateFooterStatus() {
 
   if (isOpen) {
     el.innerHTML = `<span class="status-dot open"></span> Aberto agora`;
-    el.style.cssText = "color:#4ADE80; border-color:rgba(74,222,128,0.4); background:rgba(74,222,128,0.08);";
+    el.style.cssText = "color:#4ADE80; border-color:rgba(74,222,128,0.4); background:rgba(74,222,128,0.12);";
   } else {
-    // Calcula quando abre a seguir
     const nextOpenDayNames = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
     let nextMsg = "";
     if (openDays.includes(day) && hour < 17) {
       nextMsg = "Abre hoje às 17h";
     } else {
-      // Encontra o próximo dia de abertura
       let next = (day + 1) % 7;
       while (!openDays.includes(next)) next = (next + 1) % 7;
       nextMsg = `Abre ${nextOpenDayNames[next]} 17h`;
     }
     el.innerHTML = `<span class="status-dot closed"></span> Fechado · ${nextMsg}`;
-    el.style.cssText = "color:#F87171; border-color:rgba(248,113,113,0.4); background:rgba(248,113,113,0.08);";
+    el.style.cssText = "color:#F87171; border-color:rgba(248,113,113,0.4); background:rgba(248,113,113,0.12);";
   }
 }
 
 updateFooterStatus();
+
