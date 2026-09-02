@@ -1,8 +1,11 @@
-/* ==========================================================================
-   SUMMER SPORT BAR — COMPLETE DESIGN SYSTEM (DS)
-   Tokens, Variables, Components & Neobrutalist Theme Architecture
-   Automatic Dark/Light Adaptation according to device (prefers-color-scheme)
-   ========================================================================== */
+/* Font-face declaration for Nature Beauty custom font */
+@font-face {
+  font-family: "Nature Beauty";
+  src: url("./Nature-Beauty-Personal-Use/Nature Beauty Personal Use.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   /* Brand Core Palette */
@@ -288,8 +291,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 0.75rem;
-  height: 4.5rem;
+  padding: 0.5rem 0.75rem;
+  height: 6rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   overflow: visible;
   transition: background-color var(--transition-normal), border-color var(--transition-normal), height var(--transition-fast);
@@ -297,14 +300,14 @@ body {
 
 @media (min-width: 768px) {
   .app-header {
-    height: 6rem;
-    padding: 0 2rem;
+    height: 8.5rem;
+    padding: 0.75rem 2rem;
   }
 }
 
 .header-menu-btn {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: var(--border-width-md) solid var(--border-main);
   background-color: var(--color-orange-500);
   color: #000000;
@@ -320,8 +323,8 @@ body {
 
 @media (min-width: 768px) {
   .header-menu-btn {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 3.25rem;
+    height: 3.25rem;
   }
 }
 
@@ -342,41 +345,54 @@ body {
 }
 
 .header-logo-img {
-  max-height: 2.75rem;
+  max-height: 4.8rem;
   height: auto;
   width: auto;
   max-width: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 3px 10px rgba(238, 121, 44, 0.35));
-  background-color: var(--logo-bg);
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-pill);
-  border: var(--logo-border);
-  transition: filter var(--transition-normal), background-color var(--transition-normal), padding var(--transition-normal), border-color var(--transition-normal);
+  filter: drop-shadow(0 4px 14px rgba(238, 121, 44, 0.45));
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  transition: filter var(--transition-normal);
 }
 
 .header-logo-img:hover {
-  filter: drop-shadow(0 4px 24px rgba(238, 121, 44, 0.6));
+  filter: drop-shadow(0 6px 28px rgba(238, 121, 44, 0.75));
 }
 
 @media (min-width: 768px) {
   .header-logo-img {
-    max-height: 4.5rem;
-    padding: var(--logo-padding) calc(var(--logo-padding) + 1rem);
+    max-height: 7.2rem;
+    padding: 0;
+  }
+}
+
+/* Automatic & Manual Light Mode Logo SVG Swap (Off-white -> Black) */
+[data-theme="light"] .header-logo-img,
+[data-theme="light"] .sidebar-footer-logo {
+  content: url("SummerBeachSportsBarVazado-light.svg");
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .header-logo-img,
+  :root:not([data-theme="dark"]) .sidebar-footer-logo {
+    content: url("SummerBeachSportsBarVazado-light.svg");
   }
 }
 
 /* Ghost spacer for perfect flex centering */
 .header-spacer {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
   .header-spacer {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 3.25rem;
+    height: 3.25rem;
   }
 }
 
@@ -399,14 +415,21 @@ body {
 }
 
 .section-title {
-  font-family: var(--font-family-sans);
-  font-weight: var(--font-weight-black);
-  font-size: 1.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 1rem;
+  font-family: "Nature Beauty", cursive, var(--font-family-sans);
+  font-weight: normal;
+  font-size: 2.25rem;
+  text-transform: none;
+  text-align: center;
+  letter-spacing: 0.02em;
+  margin-bottom: 1.25rem;
   color: var(--text-heading-color);
   text-shadow: 2px 2px 0px var(--shadow-color);
+}
+
+@media (min-width: 640px) {
+  .section-title {
+    font-size: 2.75rem;
+  }
 }
 
 /* Category Chips Scroll */
@@ -514,7 +537,7 @@ body {
 
 .product-card-image-box {
   width: 100%;
-  aspect-ratio: 4 / 3; /* Better proportions on 2-column mobile layout */
+  aspect-ratio: 3 / 4;
   background-color: var(--card-image-bg);
   border: var(--border-width-sm) solid var(--border-card);
   border-radius: var(--radius-md);
@@ -524,12 +547,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-@media (min-width: 640px) {
-  .product-card-image-box {
-    aspect-ratio: 3 / 4;
-  }
 }
 
 .product-card-img {
@@ -1154,17 +1171,17 @@ body {
 }
 
 .sidebar-footer-logo {
-  height: 3rem;
+  height: 3.5rem;
   width: auto;
   margin: 0 auto 0.5rem auto;
-  opacity: 0.9;
+  opacity: 0.95;
   display: block;
   filter: drop-shadow(0 4px 16px rgba(238, 121, 44, 0.35));
-  background-color: var(--logo-bg);
-  padding: var(--logo-padding) calc(var(--logo-padding) + 0.75rem);
-  border-radius: var(--radius-pill);
-  border: var(--logo-border);
-  transition: filter var(--transition-normal), background-color var(--transition-normal), padding var(--transition-normal), border-color var(--transition-normal);
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  transition: filter var(--transition-normal);
 }
 
 .sidebar-footer-logo:hover {
@@ -1236,8 +1253,8 @@ body {
 
 .product-modal-image-wrapper {
   width: 100%;
-  aspect-ratio: 16 / 10;
-  max-height: 220px;
+  aspect-ratio: 3 / 4;
+  max-height: 320px;
   background-color: var(--card-image-bg);
   border-bottom: var(--border-width-md) solid var(--border-card);
   overflow: hidden;
