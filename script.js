@@ -24,7 +24,7 @@ function convertDriveLink(url) {
   // Se for um link do Google Drive (/file/d/ID/view ou /d/ID)
   const driveMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
   if (driveMatch) {
-    return `https://lh3.googleusercontent.com/u/0/d/${driveMatch[1]}=w800`;
+    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w800`;
   }
 
   return url;
@@ -387,7 +387,7 @@ function renderProducts(items) {
           <img src="${item.image}" alt="${item.name}" 
                class="product-card-img" 
                loading="lazy"
-               onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center;&quot;>Summer Sport Bar</span>'">
+               onerror="this.onerror=null; this.src='SummerBeachSportsBarVazado.svg'; this.style.objectFit='contain'; this.style.padding='0.5rem';">
           <span class="product-card-category-tag">${item.category}</span>
         </div>
       `
@@ -444,17 +444,11 @@ function openProductModal(id) {
   const wppText = encodeURIComponent(`Olá! Gostaria de pedir: *${item.name}* (${item.category}) no Summer Sport Bar.`);
 
   modalContent.innerHTML = `
-    ${
-      item.image
-        ? `
       <div class="product-modal-image-wrapper">
         ${hasPromo ? `<div class="promo-badge-tag ${promo.badgeClass || ''}" style="top: 12px; left: 50%;">${promo.promoLabel}</div>` : ''}
-        <img src="${item.image}" alt="${item.name}" class="product-modal-img" onerror="this.parentElement.style.display='none'">
+        <img src="${item.image || 'SummerBeachSportsBarVazado.svg'}" alt="${item.name}" class="product-modal-img" onerror="this.onerror=null; this.src='SummerBeachSportsBarVazado.svg'; this.style.objectFit='contain'; this.style.padding='1rem';">
         <span class="product-modal-badge">${item.category}</span>
       </div>
-    `
-        : ""
-    }
     <div class="product-modal-info">
       <div>
         <h3 class="product-modal-title">${item.name}</h3>
