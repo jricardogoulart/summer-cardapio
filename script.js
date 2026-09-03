@@ -378,8 +378,8 @@ function getActivePromos() {
 
   // === PROMOÇÃO QUINTA-FEIRA ===
   if (day === 4) {
-    // Caipirinhas em Dobro: cada uma a R$ 9,90
-    [46, 47, 48, 49].forEach((id) => {
+    // Caipirinhas em Dobro: cada uma a R$ 9,90 (ids 48–52 após renumeração do cardápio)
+    [48, 49, 50, 51, 52].forEach((id) => {
       promos[id] = { promoPrice: 9.90, promoLabel: "2X CAIPIRINHA", badgeClass: "badge-quinta" };
     });
     // Batata Frita a R$ 22,90
@@ -387,9 +387,9 @@ function getActivePromos() {
   }
 
   // === TODOS OS DIAS (Antes das 00:00) → Chopp a R$ 3,40 com Tag Promo ===
-  // Após as 00:00 (entre 00:00 e 05:59), a tag é removida e o valor fica R$ 6,90
+  // Após as 00:00 (entre 00:00 e 05:59), a tag é removida e o valor fica R$ 6,80
   if (!(hour >= 0 && hour < 6)) {
-    promos[36] = { promoPrice: 3.40, promoLabel: "CHOPP PROMO", badgeClass: "badge-chopp" };
+    promos[38] = { promoPrice: 3.40, promoLabel: "CHOPP PROMO", badgeClass: "badge-chopp" };
   }
 
   return promos;
