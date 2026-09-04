@@ -568,6 +568,143 @@ function closeProductModal() {
   }
 }
 
+// Pop-up Modal de Compartilhamento do Cardápio
+function openShareModal() {
+  // Fecha a sidebar (menu drawer) se estiver aberta
+  const menuDrawer = document.getElementById("menu-drawer");
+  if (menuDrawer && !menuDrawer.classList.contains("hidden")) {
+    if (typeof gsap !== "undefined") {
+      gsap.to("#menu-overlay", {
+        x: "-100%",
+        duration: 0.2,
+        ease: "power2.in",
+        onComplete: () => {
+          menuDrawer.classList.add("hidden");
+        }
+      });
+    } else {
+      menuDrawer.classList.add("hidden");
+    }
+  }
+
+  const shareModal = document.getElementById("share-modal");
+  if (!shareModal) return;
+
+  shareModal.classList.remove("hidden");
+  document.body.style.overflow = "hidden"; // Bloqueia scroll de fundo
+
+  if (typeof gsap !== "undefined") {
+    gsap.fromTo(
+      shareModal,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.2, ease: "power2.out" }
+    );
+    gsap.fromTo(
+      "#share-modal-dialog",
+      { scale: 0.85, y: 25, opacity: 0 },
+      { scale: 1, y: 0, opacity: 1, duration: 0.35, ease: "back.out(1.4)" }
+    );
+  }
+}
+
+function closeShareModal() {
+  const shareModal = document.getElementById("share-modal");
+  if (!shareModal || shareModal.classList.contains("hidden")) return;
+
+  // Se o modal de produtos também não estiver aberto, restaura o scroll
+  const productModal = document.getElementById("product-modal");
+  if (!productModal || productModal.classList.contains("hidden")) {
+    document.body.style.overflow = "";
+  }
+
+  if (typeof gsap !== "undefined") {
+    gsap.to("#share-modal-dialog", {
+      scale: 0.9,
+      y: 15,
+      opacity: 0,
+      duration: 0.2,
+      ease: "power2.in"
+    });
+    gsap.to(shareModal, {
+      opacity: 0,
+      duration: 0.2,
+      ease: "power2.in",
+      onComplete: () => {
+        shareModal.classList.add("hidden");
+      }
+    });
+  } else {
+    shareModal.classList.add("hidden");
+  }
+}
+
+async function copyMenuLink() {
+  const linkText = window.location.href;
+  const copyBtn = document.getElementById("copy-link-btn");
+  const copyTextEl = document.getElementById("copy-link-text");
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(linkText);
+    } else {
+      // Fallback para navegadores mais antigos ou protocol file://
+      const textArea = document.createElement("textarea");
+      textArea.value = linkText;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+
+    if (copyBtn && copyTextEl) {
+      copyBtn.classList.add("copied");
+      const originalText = copyTextEl.textContent;
+      copyTextEl.textContent = "Link Copiado! ✨";
+      setTimeout(() => {
+        copyBtn.classList.remove("copied");
+        copyTextEl.textContent = originalText;
+      }, 2500);
+    }
+  } catch (err) {
+    console.error("Falha ao copiar link:", err);
+    if (copyTextEl) copyTextEl.textContent = "Erro ao copiar. Tente novamente.";
+  }
+}
+
+function shareMenuWhatsApp(e) {
+  if (e) e.preventDefault();
+  const url = window.location.href;
+  const text = encodeURIComponent(`Confira o cardápio digital do Summer Sport Bar! 🍹🍢\nAcesse: ${url}`);
+  const wppUrl = `https://api.whatsapp.com/send?text=${text}`;
+  window.open(wppUrl, "_blank");
+}
+
+async function shareMenuNative() {
+  const url = window.location.href;
+  const shareData = {
+    title: "Summer Sport Bar - Cardápio Digital",
+    text: "Confira o cardápio digital do Summer Sport Bar!",
+    url: url
+  };
+
+  if (navigator.share) {
+    try {
+      await navigator.share(shareData);
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.warn("Erro no Web Share API:", err);
+        copyMenuLink();
+      }
+    }
+  } else {
+    // Fallback inteligente caso navigator.share não exista
+    copyMenuLink();
+  }
+}
+
 function filterCategory(cat) {
   activeCategory = cat;
   renderCategories();
@@ -658,10 +795,25 @@ function setupEvents() {
     });
   }
 
+  // Elementos do Pop-up Modal de Compartilhamento
+  const shareModal = document.getElementById("share-modal");
+  const closeShareModalBtn = document.getElementById("close-share-modal");
+
+  if (closeShareModalBtn) {
+    closeShareModalBtn.addEventListener("click", closeShareModal);
+  }
+
+  if (shareModal) {
+    shareModal.addEventListener("click", (e) => {
+      if (e.target === shareModal) closeShareModal();
+    });
+  }
+
   // Fecha modais com a tecla ESC
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeProductModal();
+      closeShareModal();
       closeMenuDrawer();
     }
   });

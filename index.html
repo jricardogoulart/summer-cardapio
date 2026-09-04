@@ -254,6 +254,26 @@
             </div>
           </div>
 
+          <!-- Opção de Compartilhamento do Cardápio -->
+          <div class="sidebar-share-wrapper">
+            <button
+              type="button"
+              id="sidebar-share-btn"
+              class="sidebar-share-btn"
+              onclick="openShareModal()"
+              title="Compartilhar Cardápio"
+            >
+              <div class="sidebar-share-qr-preview">
+                <img src="image.png" alt="QR Code Cardápio" class="sidebar-share-qr-img" />
+              </div>
+              <div class="sidebar-share-info">
+                <span class="sidebar-share-title">Compartilhar Cardápio</span>
+                <span class="sidebar-share-sub">QR Code &amp; Link Rápido</span>
+              </div>
+              <span class="material-symbols-outlined sidebar-share-icon">qr_code_2</span>
+            </button>
+          </div>
+
           <!-- Lista de atalhos das categorias -->
           <div
             id="sidebar-categories"
@@ -289,6 +309,71 @@
 
         <!-- Conteúdo Renderizado Dinamicamente -->
         <div id="product-modal-content"></div>
+      </div>
+    </div>
+
+    <!-- Pop-up Modal de Compartilhamento do Cardápio (QR Code & Envio) -->
+    <div
+      id="share-modal"
+      class="product-modal-backdrop hidden"
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div id="share-modal-dialog" class="product-modal-dialog share-modal-dialog">
+        <!-- Botão Fechar -->
+        <button
+          id="close-share-modal"
+          class="product-modal-close-btn"
+          aria-label="Fechar pop-up de compartilhamento"
+          onclick="closeShareModal()"
+        >
+          <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+        </button>
+
+        <div class="share-modal-content">
+          <!-- Imagem do QR Code -->
+          <div class="share-modal-image-wrapper">
+            <img src="image.png" alt="QR Code do Cardápio" class="share-modal-qr-img" />
+            <span class="share-modal-badge">QR CODE CARDÁPIO</span>
+          </div>
+
+          <div class="share-modal-info">
+            <div>
+              <h3 class="share-modal-title">Compartilhar Cardápio</h3>
+              <p class="share-modal-description">
+                Escaneie o QR Code com a câmera do celular ou use os botões abaixo para enviar o link do cardápio digital do Summer Sport Bar.
+              </p>
+            </div>
+
+            <div class="share-modal-actions">
+              <!-- Botão Copiar Link -->
+              <button id="copy-link-btn" class="share-btn share-btn-copy" onclick="copyMenuLink()">
+                <span class="material-symbols-outlined">content_copy</span>
+                <span id="copy-link-text">Copiar Link do Cardápio</span>
+              </button>
+
+              <!-- Botão Compartilhar no WhatsApp -->
+              <a
+                id="share-wpp-btn"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="share-btn share-btn-wpp"
+                onclick="shareMenuWhatsApp(event)"
+              >
+                <span class="material-symbols-outlined">chat</span>
+                <span>Enviar no WhatsApp</span>
+              </a>
+
+              <!-- Botão Compartilhar Geral (Web Share API) -->
+              <button id="native-share-btn" class="share-btn share-btn-native" onclick="shareMenuNative()">
+                <span class="material-symbols-outlined">share</span>
+                <span>Mais Opções de Envio</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
