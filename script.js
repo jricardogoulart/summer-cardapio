@@ -31,8 +31,12 @@ function updateQrCodeImage(url) {
 function loadQrCodeFromSheet(csvText) {
   if (typeof Papa === "undefined") return;
 
-  const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-  const qrCodeUrl = parsed.data?.[0]?.qrcode;
+  const parsed = Papa.parse(csvText, {
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: (header) => header.trim().toLowerCase(),
+  });
+  const qrCodeUrl = parsed.data?.[0]?.qrcode?.trim();
   updateQrCodeImage(qrCodeUrl);
 }
 
