@@ -53,6 +53,61 @@ function convertDriveLink(url) {
   return url;
 }
 
+// Mapeamento de nomes de dias da promoção para getDay() (0=Dom … 6=Sáb).
+// -1 = "Todos" (ativo todos os dias), null = sem promoção.
+const PROMO_DAY_MAP = {
+  domingo: 0,
+  segunda: 1,
+  terça: 2,
+  terca: 2,
+  quarta: 3,
+  quinta: 4,
+  sexta: 5,
+  sábado: 6,
+  sabado: 6,
+  todos: -1,
+};
+
+const PROMO_DAY_LABEL = [
+  "DOMINGO",
+  "SEGUNDA",
+  "TERÇA",
+  "QUARTA",
+  "QUINTA",
+  "SEXTA",
+  "SÁBADO",
+];
+
+function normalizeAvailability(raw) {
+  const value = (raw || "").toString().trim();
+  const lower = value.toLowerCase();
+  if (lower === "sim") return "Sim";
+  if (lower === "não" || lower === "nao") return "Não";
+  if (lower === "indisponível" || lower === "indisponivel")
+    return "Indisponível";
+  return (
+    (value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()) || "Sim"
+  );
+}
+
+function normalizePromoDay(raw) {
+  const value = (raw || "").toString().trim();
+  const lower = value.toLowerCase();
+  if (!lower || lower === "não" || lower === "nao") return null;
+  return PROMO_DAY_MAP[lower] ?? null;
+}
+
+function parsePromoPrice(raw) {
+  if (raw == null) return null;
+  const str = String(raw)
+    .trim()
+    .replace("R$", "")
+    .replace(/\s+/g, "")
+    .replace(",", ".");
+  const n = parseFloat(str);
+  return Number.isNaN(n) ? null : n;
+}
+
 // Helper para parsear CSV manualmente com suporte a aspas e vírgulas embutidas
 function parseCSV(csvText) {
   const lines = csvText.split(/\r?\n/).filter((line) => line.trim() !== "");
@@ -102,6 +157,15 @@ function parseCSV(csvText) {
         catFormatted.slice(1).toLowerCase();
     }
 
+    const availabilityRaw = (
+      row.disponibilidade || row.disponiveis || row.available || "Sim"
+    )
+      .toString()
+      .trim();
+    const availability = normalizeAvailability(availabilityRaw);
+    const promoDay = normalizePromoDay(row.promo || row.promocao || "");
+    const promoPrice = parsePromoPrice(row.precopromo || "");
+
     return {
       id: parseInt(row.id) || index + 1,
       name: row.nome || row.name || `Item ${index + 1}`,
@@ -109,6 +173,9 @@ function parseCSV(csvText) {
       price: parseFloat(priceStr) || 0,
       description: row.descricao || row.description || row.desc || "",
       image: convertDriveLink(imageUrl),
+      availability: availability,
+      promoDay: promoDay,
+      promoPrice: promoPrice,
     };
   });
 }
@@ -121,6 +188,7 @@ const EMBEDDED_PRODUCTS = [
     name: "Carne Bovina",
     description: "Mix de Carnes Nobres, Alcatra, Bananinha, Fraldinha",
     price: 10.0,
+    availability: "Sim",
     image: convertDriveLink(
       "https://drive.google.com/file/d/1AZMEi_M-i4N1GwoMaQWh8JiIKjsrgBPs/view?usp=drive_link",
     ),
@@ -955,11 +1023,19 @@ const EMBEDDED_PRODUCTS = [
     name: "Halls",
     description: "Unidade",
     price: 3.0,
+    availability: "Sim",
     image: convertDriveLink(
       "https://drive.google.com/file/d/1eYRXWRXGq2XvIUJtl90c8pt4p809Td-E/view?usp=drive_link",
     ),
   },
 ];
+
+// Garante que todos os produtos embutidos tenham o campo availability (padrão "Sim")
+EMBEDDED_PRODUCTS.forEach((p) => {
+  if (!("availability" in p)) p.availability = "Sim";
+  if (!("promoDay" in p)) p.promoDay = null;
+  if (!("promoPrice" in p)) p.promoPrice = null;
+});
 
 // Helper: parseia CSV bruto (PapaParse ou fallback manual) → array de produtos normalizados
 function parseCsvToProducts(csvText) {
@@ -994,6 +1070,15 @@ function parseCsvToProducts(csvText) {
         catFormatted.slice(1).toLowerCase();
     }
 
+    const availabilityRaw = (
+      row.disponibilidade || row.disponiveis || row.available || "Sim"
+    )
+      .toString()
+      .trim();
+    const availability = normalizeAvailability(availabilityRaw);
+    const promoDay = normalizePromoDay(row.promo || row.promocao || "");
+    const promoPrice = parsePromoPrice(row.precopromo || "");
+
     return {
       id: parseInt(row.id) || index + 1000,
       name: row.nome || row.name || `Item ${index + 1}`,
@@ -1001,6 +1086,9 @@ function parseCsvToProducts(csvText) {
       price: parseFloat(priceStr) || 0,
       description: row.desc || row.descricao || row.description || "",
       image: convertDriveLink(imageUrl),
+      availability: availability,
+      promoDay: promoDay,
+      promoPrice: promoPrice,
     };
   });
 }
@@ -1177,60 +1265,32 @@ function selectCategoryFromSidebar(cat) {
   }
 }
 
-// Retorna promoções ativas com base no dia da semana e hora atual
+// Retorna promoções ativas com base no dia da semana, lendo colunas `promo`
+// e `precopromo` do CSV (via campos promoDay/promoPrice dos produtos).
+// Um produto entra em promoção quando promoDay é igual ao dia atual
+// (0=Dom … 6=Sáb) ou quando é -1 ("Todos", ativo todos os dias).
 function getActivePromos() {
   const now = new Date();
   const day = now.getDay(); // 0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sáb
-  const hour = now.getHours();
   const promos = {};
 
-  // === PROMOÇÃO QUARTA-FEIRA ===
-  if (day === 3) {
-    // Espetos em promoção a R$ 7,90 (exceto Kafta id:5, Queijo Coalho id:8, Provolone id:10, Medalhão de Queijo id:9, Jantinha id:12)
-    const excludedIds = [5, 8, 9, 10, 12];
-    products
-      .filter((p) => p.category === "Espetos" && !excludedIds.includes(p.id))
-      .forEach((p) => {
-        promos[p.id] = {
-          promoPrice: 7.9,
-          promoLabel: "◆ ESPETO PROMO ◆",
-          badgeClass: "badge-quarta",
-        };
-      });
-    // Heineken 600ml (id: 43 após renumeração do cardápio) a R$ 12,90
-    promos[43] = {
-      promoPrice: 12.9,
-      promoLabel: "◆ HEINEKEN PROMO ◆",
-      badgeClass: "badge-quarta",
-    };
-  }
+  for (const p of products) {
+    const promoDay = p.promoDay;
+    if (promoDay == null) continue;
+    const isTodos = promoDay === -1;
+    if (!isTodos && promoDay !== day) continue;
 
-  // === PROMOÇÃO QUINTA-FEIRA ===
-  if (day === 4) {
-    // Caipirinhas em Dobro: cada uma a R$ 9,90 (ids 48–52 após renumeração do cardápio)
-    [48, 49, 50, 51, 52].forEach((id) => {
-      promos[id] = {
-        promoPrice: 9.9,
-        promoLabel: "2X CAIPIRINHA",
-        badgeClass: "badge-quinta",
-      };
-    });
-    // Batata Frita a R$ 22,90
-    promos[20] = {
-      promoPrice: 22.9,
-      promoLabel: "◆ QUINTA PROMO ◆",
-      badgeClass: "badge-quinta",
-    };
-  }
+    const promoPrice = p.promoPrice != null ? p.promoPrice : p.price;
+    const label = isTodos
+      ? "PROMO TODOS OS DIAS"
+      : `PROMO ${PROMO_DAY_LABEL[promoDay]}`;
+    const badgeClass = isTodos
+      ? "badge-noturno"
+      : `badge-${PROMO_DAY_LABEL[promoDay]
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "")}`;
 
-  // === TODOS OS DIAS (Antes das 00:00) → Chopp a R$ 3,40 com Tag Promo ===
-  // Após as 00:00 (entre 00:00 e 05:59), a tag é removida e o valor fica R$ 6,80
-  if (!(hour >= 0 && hour < 6)) {
-    promos[38] = {
-      promoPrice: 3.4,
-      promoLabel: "CHOPP PROMO",
-      badgeClass: "badge-chopp",
-    };
+    promos[p.id] = { promoPrice, promoLabel: label, badgeClass };
   }
 
   return promos;
@@ -1256,14 +1316,22 @@ function renderProducts(items) {
       const promo = activePromos[item.id];
       const hasPromo = !!promo;
       const displayPrice = hasPromo ? promo.promoPrice : item.price;
+      const availability = (item.availability || "Sim").toString().trim();
+      const isUnavailable = availability.toLowerCase() === "indisponível" ||
+        availability.toLowerCase() === "indisponivel";
 
       return `
     <div class="product-card-item${hasPromo ? " promo-card" : ""}" onclick="openProductModal(${item.id})" role="button" tabindex="0" aria-label="Ver detalhes de ${item.name}">
       ${
         hasPromo
           ? `
-        <div class="promo-badge-tag ${promo.badgeClass || ""}">${promo.promoLabel}</div>
-      `
+        <div class="promo-badge-tag ${promo.badgeClass || ""}">${promo.promoLabel}</div>`
+          : ""
+      }
+      ${
+        isUnavailable
+          ? `
+        <div class="availability-badge-tag availability-badge-unavailable">Indisponível</div>`
           : ""
       }
       ${
@@ -1271,12 +1339,11 @@ function renderProducts(items) {
           ? `
         <div class="product-card-image-box">
           <img src="${item.image}" alt="${item.name}" 
-               class="product-card-img" 
+               class="product-card-img${isUnavailable ? " unavailable" : ""}" 
                loading="lazy"
                onerror="this.onerror=null; this.src='SummerBeachSportsBarVazado.svg'; this.style.objectFit='contain'; this.style.padding='0.5rem';">
           <span class="product-card-category-tag">${item.category}</span>
-        </div>
-      `
+        </div>`
           : ""
       }
       <div class="product-card-body">
@@ -1338,6 +1405,9 @@ function openProductModal(id) {
   const promo = activePromos[item.id];
   const hasPromo = !!promo;
   const displayPrice = hasPromo ? promo.promoPrice : item.price;
+  const availability = (item.availability || "Sim").toString().trim();
+  const isUnavailable = availability.toLowerCase() === "indisponível" ||
+    availability.toLowerCase() === "indisponivel";
   const wppText = encodeURIComponent(
     `Olá! Gostaria de pedir: *${item.name}* (${item.category}) no Summer Sport Bar.`,
   );
@@ -1345,12 +1415,22 @@ function openProductModal(id) {
   modalContent.innerHTML = `
       <div class="product-modal-image-wrapper">
         ${hasPromo ? `<div class="promo-badge-tag ${promo.badgeClass || ""}" style="top: 12px; left: 50%;">${promo.promoLabel}</div>` : ""}
-        <img src="${item.image || "SummerBeachSportsBarVazado.svg"}" alt="${item.name}" class="product-modal-img" onerror="this.onerror=null; this.src='SummerBeachSportsBarVazado.svg'; this.style.objectFit='contain'; this.style.padding='1rem';">
+        ${
+          isUnavailable
+            ? `<div class="availability-badge-tag availability-badge-unavailable" style="top: 12px; right: 12px; left: auto;">Indisponível</div>`
+            : ""
+        }
+        <img src="${item.image || "SummerBeachSportsBarVazado.svg"}" alt="${item.name}" class="product-modal-img${isUnavailable ? " unavailable" : ""}" onerror="this.onerror=null; this.src='SummerBeachSportsBarVazado.svg'; this.style.objectFit='contain'; this.style.padding='1rem';">
         <span class="product-modal-badge">${item.category}</span>
       </div>
     <div class="product-modal-info">
       <div>
         <h3 class="product-modal-title">${item.name}</h3>
+        ${
+          isUnavailable
+            ? `<div class="availability-modal-alert">⚠️ Item Indisponível no momento</div>`
+            : ""
+        }
         ${item.description ? `<p class="product-modal-description" style="margin-top: 0.5rem;">${item.description}</p>` : ""}
       </div>
 
@@ -1594,7 +1674,10 @@ function filterProducts() {
     const matchesSearch =
       item.name.toLowerCase().includes(query) ||
       item.description.toLowerCase().includes(query);
-    return matchesCategory && matchesSearch;
+    const availability = (item.availability || "Sim").toString().trim();
+    const isHidden = availability.toLowerCase() === "não" ||
+      availability.toLowerCase() === "nao";
+    return matchesCategory && matchesSearch && !isHidden;
   });
   renderProducts(filtered);
 }

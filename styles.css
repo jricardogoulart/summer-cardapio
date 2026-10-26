@@ -790,6 +790,44 @@ body {
   animation: promo-night 2.6s ease-in-out infinite;
 }
 
+/* Tag de Indisponibilidade */
+.availability-badge-tag {
+  position: absolute;
+  top: -14px;
+  right: 0.5rem;
+  transform: none;
+  z-index: 10;
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-black);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: var(--border-width-sm) solid #000000;
+  white-space: nowrap;
+  max-width: 92%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: linear-gradient(105deg, #6B7280 0%, #4B5563 50%, #374151 100%);
+  color: #FFFFFF;
+  box-shadow: 2px 2px 0px 0px #000000;
+  animation: promo-float 2.4s ease-in-out infinite;
+}
+
+.availability-badge-unavailable {
+  background: linear-gradient(105deg, #6B7280 0%, #4B5563 50%, #374151 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 2px 2px 0px 0px #000000, 0 0 10px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Imagem de item indisponível (escala de cinza) */
+.product-card-img.unavailable,
+.product-modal-img.unavailable {
+  filter: grayscale(100%);
+  opacity: 0.65;
+}
+
 /* Promo Card Borders */
 .promo-card {
   border-color: var(--color-orange-500) !important;
@@ -1385,6 +1423,24 @@ body {
   font-weight: var(--font-weight-medium);
   color: var(--text-sub);
   line-height: 1.5;
+}
+
+.availability-modal-alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-black);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+  background: linear-gradient(105deg, #6B7280 0%, #4B5563 50%, #374151 100%);
+  border: var(--border-width-sm) solid #000000;
+  border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0px 0px #000000;
 }
 
 .product-modal-price-box {
