@@ -1128,17 +1128,18 @@ async function fetchSheetInBackground() {
     }
 
     const csvText = await response.text();
+    const cleanedCsv = csvText.replace(/^\uFEFF/, "");
     const elapsed = (performance.now() - t0).toFixed(0);
 
-    if (!csvText || csvText.trim().startsWith("<!DOCTYPE")) {
+    if (!cleanedCsv || cleanedCsv.trim().startsWith("<!DOCTYPE")) {
       console.warn(
         "⚠️ Resposta do Google Sheets não é CSV válido. Mantendo dados embutidos.",
       );
       return;
     }
 
-    loadQrCodeFromSheet(csvText);
-    const freshProducts = parseCsvToProducts(csvText);
+    loadQrCodeFromSheet(cleanedCsv);
+    const freshProducts = parseCsvToProducts(cleanedCsv);
     if (!freshProducts || freshProducts.length === 0) {
       console.warn(
         "⚠️ Nenhum produto parseado da planilha. Mantendo dados embutidos.",
@@ -1408,9 +1409,6 @@ function openProductModal(id) {
   const availability = (item.availability || "Sim").toString().trim();
   const isUnavailable = availability.toLowerCase() === "indisponível" ||
     availability.toLowerCase() === "indisponivel";
-  const wppText = encodeURIComponent(
-    `Olá! Gostaria de pedir: *${item.name}* (${item.category}) no Summer Sport Bar.`,
-  );
 
   modalContent.innerHTML = `
       <div class="product-modal-image-wrapper">
@@ -1449,16 +1447,6 @@ function openProductModal(id) {
         `
         }
       </div>
-
-      <a
-        href="https://wa.me/5516992911737?text=${wppText}"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="product-modal-cta-btn"
-      >
-        <span class="material-symbols-outlined" style="font-size: 20px;">chat</span>
-        <span>Pedir pelo WhatsApp</span>
-      </a>
     </div>
   `;
 
