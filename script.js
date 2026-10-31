@@ -162,9 +162,22 @@ function parseCSV(csvText) {
     )
       .toString()
       .trim();
-    const availability = normalizeAvailability(availabilityRaw);
-    const promoDay = normalizePromoDay(row.promo || row.promocao || "");
-    const promoPrice = parsePromoPrice(row.precopromo || "");
+    const availability =
+      availabilityRaw.charAt(0).toUpperCase() +
+      availabilityRaw.slice(1).toLowerCase();
+
+    const promoRaw = (row.promo || row.promocao || row.promotion || "").toString().trim();
+    const promoKey = promoRaw.toLowerCase();
+    const promoDay = Object.prototype.hasOwnProperty.call(PROMO_DAY_MAP, promoKey)
+      ? PROMO_DAY_MAP[promoKey]
+      : null;
+    const promoPriceStr = (row.precopromo || row.preco_promo || row.promo_price || "")
+      .toString()
+      .trim()
+      .replace("R$", "")
+      .replace(/\s+/g, "")
+      .replace(",", ".");
+    const promoPrice = promoPriceStr ? parseFloat(promoPriceStr) || 0 : null;
 
     return {
       id: parseInt(row.id) || index + 1,
@@ -1075,9 +1088,22 @@ function parseCsvToProducts(csvText) {
     )
       .toString()
       .trim();
-    const availability = normalizeAvailability(availabilityRaw);
-    const promoDay = normalizePromoDay(row.promo || row.promocao || "");
-    const promoPrice = parsePromoPrice(row.precopromo || "");
+    const availability =
+      availabilityRaw.charAt(0).toUpperCase() +
+      availabilityRaw.slice(1).toLowerCase();
+
+    const promoRaw = (row.promo || row.promocao || row.promotion || "").toString().trim();
+    const promoKey = promoRaw.toLowerCase();
+    const promoDay = Object.prototype.hasOwnProperty.call(PROMO_DAY_MAP, promoKey)
+      ? PROMO_DAY_MAP[promoKey]
+      : null;
+    const promoPriceStr = (row.precopromo || row.preco_promo || row.promo_price || "")
+      .toString()
+      .trim()
+      .replace("R$", "")
+      .replace(/\s+/g, "")
+      .replace(",", ".");
+    const promoPrice = promoPriceStr ? parseFloat(promoPriceStr) || 0 : null;
 
     return {
       id: parseInt(row.id) || index + 1000,
@@ -1281,7 +1307,8 @@ function getActivePromos() {
     const isTodos = promoDay === -1;
     if (!isTodos && promoDay !== day) continue;
 
-    const promoPrice = p.promoPrice != null ? p.promoPrice : p.price;
+    const promoPrice = p.promoPrice;
+    if (promoPrice == null) continue;
     const label = isTodos
       ? "PROMO TODOS OS DIAS"
       : `PROMO ${PROMO_DAY_LABEL[promoDay]}`;
@@ -1308,9 +1335,12 @@ function renderProducts(items) {
   const activePromos = getActivePromos();
 
   // Ordena alfabeticamente por nome antes de renderizar
-  const sortedItems = [...items].sort((a, b) =>
-    a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" }),
-  );
+  const sortedItems = [...items].sort((a, b) => {
+    const aUnavail = (a.availability || "").toLowerCase() === "indisponível" || (a.availability || "").toLowerCase() === "indisponivel";
+    const bUnavail = (b.availability || "").toLowerCase() === "indisponível" || (b.availability || "").toLowerCase() === "indisponivel";
+    if (aUnavail !== bUnavail) return aUnavail ? 1 : -1;
+    return a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" });
+  });
 
   productsGrid.innerHTML = sortedItems
     .map((item) => {
